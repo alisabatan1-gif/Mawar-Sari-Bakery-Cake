@@ -20,14 +20,19 @@
 
     <!-- NAVIGATION BAR -->
     <div class="navbar">
-        <div class="logo">Mawar Sari Bakery & Cake</div>
-        <ul class="nav-links">
-            <li><a href="#home">Home</a></li>
-            <li><a href="#tentang">Tentang Kami</a></li>
-            <li><a href="#produk">Produk</a></li>
-            <li><a href="#kontak">Hubungi Kami</a></li>
-        </ul>
+    <div class="logo">Mawar Sari Bakery & Cake</div>
+
+    <div class="menu-toggle" id="menu-toggle">
+        ☰
     </div>
+
+    <ul class="nav-links" id="nav-links">
+        <li><a href="#home">Home</a></li>
+        <li><a href="#tentang">Tentang Kami</a></li>
+        <li><a href="#produk">Produk</a></li>
+        <li><a href="#kontak">Hubungi Kami</a></li>
+    </ul>
+</div>
 
     <!-- HERO SECTION -->
     <div id="home" class="hero-section">
@@ -243,5 +248,15 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         });
     </script> 
+
+    <script>
+const menuToggle = document.getElementById("menu-toggle");
+const navLinks = document.getElementById("nav-links");
+
+menuToggle.addEventListener("click", function(){
+    navLinks.classList.toggle("active");
+});
+
+</script>
 </body>
 </html>
