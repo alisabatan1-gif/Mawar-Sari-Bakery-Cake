@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Admin - Mawar Sari</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f5f5f5; margin: 0; padding: 20px; }
+        .admin-container { max-width: 600px; margin: 30px auto; padding: 30px; background: #fff; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .form-group { margin-bottom: 18px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: bold; }
+        .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 16px; box-sizing: border-box; }
+        .checkbox-group { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+        .checkbox-group input { width: auto; }
+        .btn-submit { background-color: #e67e22; color: white; border: none; padding: 12px 20px; font-size: 16px; cursor: pointer; border-radius: 5px; width: 100%; font-weight: bold; }
+        .btn-submit:hover { background-color: #d35400; }
+        .menu-preview { margin-top: 30px; border-top: 2px dashed #ccc; padding-top: 20px; }
+        .preview-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; background: #f9f9f9; margin-bottom: 10px; border-radius: 5px; }
+        .btn-delete { background: #e74c3c; color: white; border: none; padding: 5px 10px; cursor: pointer; border-radius: 3px; }
+    </style>
+</head>
+<body>
+
+    <div class="admin-container">
+        <h2>🍞 Dashboard Admin Mawar Sari</h2>
+        <p>Atur kue, produk best seller, dan harga promo secara otomatis!</p>
+        
+        <form id="menuForm">
+            <div class="form-group">
+                <label for="cakeName">Nama Kue / Roti:</label>
+                <input type="text" id="cakeName" required placeholder="Contoh: Roti Tawar Spesial">
+            </div>
+            
+            <div class="form-group">
+                <label for="cakePrice">Harga Asli (Rp):</label>
+                <input type="number" id="cakePrice" required placeholder="Contoh: 15000">
+            </div>
+
+            <!-- CHECKBOX UNTUK AKTIFKAN PROMO -->
+            <div class="form-group checkbox-group">
+                <input type="checkbox" id="isPromo" onchange="togglePromoField()">
+                <label style="margin: 0;" for="isPromo">Aktifkan Harga Promo / Diskon?</label>
+            </div>
+
+            <!-- INPUTAN HARGA SETELAH DISKON -->
+            <div class="form-group" id="promoPriceField" style="display: none;">
+                <label for="cakePromoPrice">Harga Setelah Diskon (Rp):</label>
+                <input type="number" id="cakePromoPrice" placeholder="Contoh: 12000">
+            </div>
+
+            <!-- FITUR REVISI BARU: CHECKBOX PILIHAN BEST SELLER -->
+            <div class="form-group checkbox-group" style="background-color: #fef5ec; padding: 10px; border-radius: 5px; border: 1px solid #f39c12;">
+                <input type="checkbox" id="isBestSeller">
+                <label style="margin: 0; color: #d35400;" for="isBestSeller">🌟 Tampilkan di Layar Utama (Sebagai Best Seller)</label>
+            </div>
+
+            <div class="form-group">
+                <label for="cakeDesc">Deskripsi Singkat:</label>
+                <textarea id="cakeDesc" rows="3" required placeholder="Contoh: Roti lembut dengan rasa coklat..."></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="cakeImage">Pilih Foto Kue:</label>
+                <input type="file" id="cakeImage" accept="image/*" required>
+            </div>
+            
+            <button type="submit" class="btn-submit">Simpan & Tayangkan Menu</button>
+        </form>
+
+        <div class="menu-preview">
+            <h3>Daftar Menu Tambahan Saat Ini</h3>
+            <div id="adminMenuList"></div>
+            <p style="margin-top: 15px;"><a href="index.html" target="_blank">👉 Lihat Website Pembeli</a></p>
+        </div>
+    </div>
+
+    <script>
+        function togglePromoField() {
+            const isPromo = document.getElementById('isPromo').checked;
+            document.getElementById('promoPriceField').style.display = isPromo ? 'block' : 'none';
+        }
+
+        const menuForm = document.getElementById('menuForm');
+        const adminMenuList = document.getElementById('adminMenuList');
+
+        function displayAdminMenu() {
+            adminMenuList.innerHTML = '';
+            let currentMenu = JSON.parse(localStorage.getItem('umkm_menu')) || [];
+            
+            if(currentMenu.length === 0) {
+                adminMenuList.innerHTML = '<p style="color: #888;">Belum ada menu tambahan.</p>';
+                return;
+            }
+
+            currentMenu.forEach((item, index) => {
+                let labelStatus = item.isBestSeller ? ' <span style="color:#e67e22;">[⭐ Best Seller]</span>' : '';
+                adminMenuList.innerHTML += `
+                    <div class="preview-item">
+                        <div>
+                            <strong>${item.name}</strong> - Rp ${parseInt(item.price).toLocaleString('id-ID')}${labelStatus}
+                        </div>
+                        <button class="btn-delete" onclick="deleteMenu(${index})">Hapus</button>
+                    </div>
+                `;
+            });
+        }
+
+        menuForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('cakeName').value;
+            const price = document.getElementById('cakePrice').value;
+            const isPromo = document.getElementById('isPromo').checked;
+            const promoPrice = document.getElementById('cakePromoPrice').value;
+            const isBestSeller = document.getElementById('isBestSeller').checked; // Mengambil status checkbox Best Seller baru
+            const desc = document.getElementById('cakeDesc').value;
+            const imageFile = document.getElementById('cakeImage').files[0];
+
+            const reader = new FileReader();
+            reader.onloadend = function() {
+                const newCake = {
+                    name, price, isPromo, promoPrice, isBestSeller, desc, image: reader.result
+                };
+
+                let currentMenu = JSON.parse(localStorage.getItem('umkm_menu')) || [];
+                currentMenu.push(newCake);
+                localStorage.setItem('umkm_menu', JSON.stringify(currentMenu));
+
+                menuForm.reset();
+                togglePromoField();
+                displayAdminMenu();
+                alert('Hore! Menu baru berhasil dimasukkan dan disinkronkan!');
+            }
+
+            if (imageFile) {
+                reader.readAsDataURL(imageFile);
+            }
+        });
+
+        function deleteMenu(index) {
+            let currentMenu = JSON.parse(localStorage.getItem('umkm_menu')) || [];
+            currentMenu.splice(index, 1);
+            localStorage.setItem('umkm_menu', JSON.stringify(currentMenu));
+            displayAdminMenu();
+        }
+
+        displayAdminMenu();
+    </script>
+</body>
+</html>

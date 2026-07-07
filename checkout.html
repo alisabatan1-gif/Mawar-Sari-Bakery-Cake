@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout Pesanan - Mawar Sari Bakery & Cake</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css" />
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+        .navbar {
+            background-color: #fff;
+            padding: 15px 50px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-sizing: border-box;
+        }
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #d35400;
+        }
+        .nav-links { display: flex; list-style: none; margin: 0; padding: 0; }
+        .nav-links li { margin-left: 20px; }
+        .nav-links a { text-decoration: none; color: #333; font-weight: 500; }
+
+        .checkout-container {
+            max-width: 1100px;
+            height: calc(100hv-700px);
+            margin: 90px auto 0 auto;
+            padding: 15px;
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 12px;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+        @media (max-width: 768px) {
+            .checkout-container { grid-template-columns: 1fr; margin-top: 70px; padding: 10px; }
+            .navbar { display: none; }
+        }
+
+        .checkout-box {
+            background: #fff;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            box-sizing: border-box;
+            overflow-y: auto;
+            height: 100%;
+        }
+
+        .shopee-address-selector {
+            background: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #e0e0e0;
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .shopee-top-bar {
+            background: #fff;
+            padding: 12px 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .shopee-search-wrapper { flex: 1; display: flex; gap: 8px; }
+        .shopee-search-wrapper input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 1px solid #e3e3e3;
+            border-radius: 4px;
+            background: #f8f8f8;
+            font-size: 0.95rem;
+            outline: none;
+            box-sizing: border-box;
+        }
+        .shopee-search-wrapper input:focus { background: #fff; border-color: #ee4d2d; }
+        .shopee-search-btn {
+            background: #ee4d2d;
+            color: white;
+            border: none;
+            padding: 0 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        .shopee-search-btn:hover { background: #d43f21; }
+
+        .shopee-locate-btn {
+            background: #fff;
+            color: #ee4d2d;
+            border: 1px solid #ee4d2d;
+            padding: 0 14px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.2s;
+        }
+        .shopee-locate-btn:hover { background: #ee4d2d; color: #fff; }
+        .shopee-locate-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            background: #fff;
+            color: #ee4d2d;
+        }
+
+        .shopee-warning-banner {
+            background: #fff8e5;
+            padding: 12px 15px;
+            font-size: 0.85rem;
+            color: #b7791f;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid #f9ebd4;
+        }
+
+        .shopee-map-area {
+            position: relative;
+            width: 100%;
+            height: 160px;
+            border-bottom: 1px solid #eee;
+            background: #e5e3df;
+        }
+        #map { width: 100%; height: 100%; z-index: 5; }
+
+        .shopee-center-pin {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            z-index: 999;
+            pointer-events: none;
+            width: 30px;
+            height: 30px;
+            background: #ee4d2d;
+            border-radius: 50% 50% 50% 0;
+            transform: rotate(-45deg) translate(-50%, -50%);
+            margin-top: -20px;
+            margin-left: -7px;
+            box-shadow: -2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .shopee-center-pin::after {
+            content: '';
+            width: 12px;
+            height: 12px;
+            background: white;
+            position: absolute;
+            border-radius: 50%;
+            top: 9px;
+            left: 9px;
+        }
+
+        .shopee-map-attribution {
+            position: absolute;
+            bottom: 4px;
+            right: 6px;
+            z-index: 998;
+            font-size: 0.65rem;
+            color: #555;
+            background: rgba(255,255,255,0.75);
+            padding: 1px 5px;
+            border-radius: 3px;
+            pointer-events: none;
+        }
+        .shopee-map-attribution a { color: #555; pointer-events: auto; }
+
+        .shopee-map-footer {
+            background: #fafafa;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #eee;
+        }
+        .shopee-address-preview { display: flex; gap: 10px; align-items: flex-start; }
+        .shopee-address-text strong { display: block; font-size: 0.95rem; color: #222; margin-bottom: 4px; }
+        .shopee-address-text span { font-size: 0.85rem; color: #666; display: block; line-height: 1.4; }
+
+        .shopee-address-card { background: #fff; padding: 15px; border-top: 4px solid #ee4d2d; }
+        .shopee-title-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+        .shopee-title-row strong { font-size: 1rem; color: #222; }
+        .shopee-badge {
+            background: #fff5f3;
+            color: #ee4d2d;
+            border: 1px solid #ee4d2d;
+            font-size: 0.75rem;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-weight: 600;
+        }
+        .shopee-detail-text { font-size: 0.9rem; color: #555; margin: 0 0 8px 0; line-height: 1.5; }
+        .shopee-user-contact { font-size: 0.9rem; color: #777; margin: 0; font-weight: 500; }
+
+        .form-group { margin-top: 15px; }
+        .form-group label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 0.9rem; color: #444; }
+        .form-group input, .form-group textarea {
+            width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 6px; font-family: inherit; box-sizing: border-box; font-size: 0.95rem;
+        }
+        .form-group input:focus, .form-group textarea:focus {
+            border-color: #d35400; outline: none; box-shadow: 0 0 5px rgba(211,84,0,0.2);
+        }
+
+        .btn-save-address {
+            background: #fff5f3;
+            color: #ee4d2d;
+            border: 1px solid #ee4d2d;
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 15px;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+        .btn-save-address:hover { background: #ee4d2d; color: #fff; }
+
+        .product-summary { text-align: center; height: fit-content; }
+        .product-summary h2 { font-family: 'Playfair Display', serif; color: #333; margin-top: 0; font-size: 1.5rem; }
+        .product-summary img { width: 100%; max-width: 220px; height: 180px; object-fit: cover; border-radius: 10px; margin-bottom: 15px; box-shadow: 0 4px 8px rgba(0,0,0,0.05); }
+        .summary-details { text-align: left; background: #fffcf9; padding: 20px; border-radius: 8px; margin-top: 15px; border: 1px solid #f7e6d5; }
+        .summary-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.95rem; }
+        .summary-total { border-top: 1px dashed #e2c2a4; padding-top: 12px; font-weight: bold; font-size: 1.15rem; color: #d35400; }
+
+        .btn-submit-wa {
+            display: block; width: 100%; padding: 14px; background: #25d366; color: white; border: none; border-radius: 8px;
+            font-size: 1rem; font-weight: bold; cursor: pointer; text-align: center; text-decoration: none; margin-top: 25px; box-sizing: border-box;
+            box-shadow: 0 4px 10px rgba(37,211,102,0.3);
+        }
+        .btn-submit-wa:hover { background: #20ba5a; }
+        .btn-cancel { display: block; text-align: center; margin-top: 15px; color: #999; text-decoration: none; font-size: 0.9rem; }
+    </style>
+</head>
+
+<body>
+
+    <div class="navbar">
+        <div class="logo">Mawar Sari Bakery & Cake</div>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="menu.html">Produk</a></li>
+        </ul>
+    </div>
+
+    <div class="checkout-container">
+        <div class="checkout-box">
+            <form id="formCheckout" onsubmit="kirimPesananWhatsApp(event)">
+
+                <div class="shopee-address-selector">
+                    <div class="shopee-top-bar">
+                        <div class="shopee-search-wrapper">
+                            <input type="text" id="cariAlamatInput" placeholder="Ketik nama jalan / perumahan / kecamatan Anda..." onkeydown="if(event.key==='Enter'){event.preventDefault(); eksekusiCariPeta();}">
+                            <button type="button" class="shopee-search-btn" onclick="eksekusiCariPeta()">Cari</button>
+                        </div>
+                        <button type="button" class="shopee-locate-btn" id="btnLokasiSaya" onclick="gunakanLokasiSaya()">
+                            📍 Lokasi Saya
+                        </button>
+                    </div>
+
+                    <div class="shopee-warning-banner">
+                        <span>🔔</span>
+                        <span>Pesanan dikirim sesuai koordinat peta. Geser peta jika titik belum akurat.</span>
+                    </div>
+
+                    <div class="shopee-map-area">
+                        <div id="map"></div>
+                        <div class="shopee-center-pin"></div>
+                        <div class="shopee-map-attribution">
+                            © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>
+                        </div>
+                    </div>
+
+                    <div class="shopee-map-footer">
+                        <div class="shopee-address-preview">
+                            <span>📍</span>
+                            <div class="shopee-address-text">
+                                <strong id="alamatSaranTitle">Lokasi Terpilih</strong>
+                                <span id="alamatSaranSub">Memuat nama jalan otomatis...</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="shopee-address-card">
+                        <div class="shopee-title-row">
+                            <strong id="displayJalanHead">Alamat Pengiriman</strong>
+                            <span class="shopee-badge" id="statusSimpanBadge">Belum Tersimpan</span>
+                        </div>
+                        <p class="shopee-detail-text" id="displayJalanDetail">Silakan geser peta atau gunakan kolom pencarian untuk mengubah lokasi utama.</p>
+                        <p class="shopee-user-contact" id="displayNamaKontak">Belum mengisi nama & nomor kontak</p>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="nama">Nama Lengkap Penerima</label>
+                    <input type="text" id="nama" required placeholder="Masukkan nama lengkap Anda" oninput="sinkronisasiDataKontak()">
+                </div>
+                <div class="form-group">
+                    <label for="whatsapp">Nomor WhatsApp Aktif</label>
+                    <input type="tel" id="whatsapp" required placeholder="Contoh: 0812345678xx" oninput="sinkronisasiDataKontak()">
+                </div>
+                <div class="form-group">
+                    <label for="alamat">Detail Rumah Lengkap (No. Rumah, RT/RW, Blok, Patokan Fisik)</label>
+                    <textarea id="alamat" rows="2" required placeholder="Contoh: Rumah warna hijau pagar hitam, No. 12, RT 02/04" oninput="sinkronisasiDataKontak()"></textarea>
+                </div>
+
+                <button type="button" class="btn-save-address" onclick="simpanAlamatKeBrowser()">💾 Simpan Alamat Utama Kamu</button>
+
+                <div class="form-group">
+                    <label for="catatan">Catatan Tambahan untuk Kue (Opsional)</label>
+                    <input type="text" id="catatan" placeholder="Contoh: Beri lilin angka 5 & tulisan 'Happy Birthday'">
+                </div>
+
+                <input type="hidden" id="koordinat">
+
+                <button type="submit" class="btn-submit-wa">🟢 Kirim Pesanan ke WhatsApp</button>
+                <a href="menu.html" class="btn-cancel">Batal dan Kembali Pilih Kue</a>
+            </form>
+        </div>
+
+        <div class="checkout-box product-summary">
+            <h2>Ringkasan Order</h2>
+            <img id="checkoutImg" src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=500" alt="Foto Kue">
+            <div class="summary-details">
+                <div class="summary-row"><span>Nama Kue:</span><strong id="checkoutNama">Kue Sampel Premium</strong></div>
+                <div class="summary-row"><span>Kuantitas:</span><strong>1 Pcs</strong></div>
+                <div class="summary-row summary-total"><span>Total Pembayaran:</span><span id="checkoutHarga">Rp 150.000</span></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+        let produkCheckout = null;
+        let map;
+        let timerGeocode;
+
+        const defaultLat = -6.1969;
+        const defaultLng = 106.6789;
+
+        function initMap() {
+            map = L.map('map', { zoomControl: false, attributionControl: false }).setView([defaultLat, defaultLng], 15);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19
+            }).addTo(map);
+
+            const alamatTersimpan = JSON.parse(localStorage.getItem('alamat_rumah_user'));
+
+            setTimeout(() => {
+                map.invalidateSize();
+                if (alamatTersimpan && alamatTersimpan.lat && alamatTersimpan.lng) {
+                    map.setView([alamatTersimpan.lat, alamatTersimpan.lng], 17);
+                    document.getElementById('nama').value = alamatTersimpan.nama || '';
+                    document.getElementById('whatsapp').value = alamatTersimpan.whatsapp || '';
+                    document.getElementById('alamat').value = alamatTersimpan.detail || '';
+
+                    const badge = document.getElementById('statusSimpanBadge');
+                    badge.innerText = "Alamat Tersimpan";
+                    badge.style.background = "#e6fffa";
+                    badge.style.color = "#319795";
+                    badge.style.borderColor = "#319795";
+
+                    sinkronisasiDataKontak();
+                } else {
+                    lacakNamaJalanOtomatis(defaultLat, defaultLng);
+                }
+            }, 300);
+
+            map.on('moveend', function () {
+                const posisiTengah = map.getCenter();
+                document.getElementById('koordinat').value = `${posisiTengah.lat.toFixed(6)}, ${posisiTengah.lng.toFixed(6)}`;
+
+                clearTimeout(timerGeocode);
+                timerGeocode = setTimeout(() => {
+                    lacakNamaJalanOtomatis(posisiTengah.lat, posisiTengah.lng);
+                }, 500);
+            });
+        }
+
+        function gunakanLokasiSaya() {
+            const tombol = document.getElementById('btnLokasiSaya');
+
+            if (!navigator.geolocation) {
+                alert("Browser kamu tidak mendukung fitur lokasi otomatis. Silakan geser peta secara manual.");
+                return;
+            }
+
+            const labelAwal = tombol.innerHTML;
+            tombol.disabled = true;
+            tombol.innerHTML = "⏳ Mencari...";
+
+            navigator.geolocation.getCurrentPosition(
+                function (posisi) {
+                    const lat = posisi.coords.latitude;
+                    const lng = posisi.coords.longitude;
+                    map.flyTo([lat, lng], 17);
+
+                    tombol.disabled = false;
+                    tombol.innerHTML = labelAwal;
+                },
+                function (error) {
+                    tombol.disabled = false;
+                    tombol.innerHTML = labelAwal;
+
+                    let pesan = "Tidak bisa mengambil lokasi kamu.";
+                    if (error.code === error.PERMISSION_DENIED) {
+                        pesan = "Akses lokasi ditolak. Aktifkan izin lokasi di browser untuk pakai fitur ini, atau geser peta secara manual.";
+                    } else if (error.code === error.POSITION_UNAVAILABLE) {
+                        pesan = "Lokasi tidak tersedia saat ini. Coba lagi atau geser peta secara manual.";
+                    } else if (error.code === error.TIMEOUT) {
+                        pesan = "Waktu pencarian lokasi habis. Coba lagi.";
+                    }
+                    alert(pesan);
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 0
+                }
+            );
+        }
+
+        function eksekusiCariPeta() {
+            const kueri = document.getElementById('cariAlamatInput').value;
+            if (!kueri || kueri.trim().length < 3) return;
+
+            let kueriBersih = kueri.toLowerCase()
+                .replace(/no\s*\.?\s*\d+/g, '')
+                .replace(/rt\s*\.?\s*\d+/g, '')
+                .replace(/rw\s*\.?\s*\d+/g, '')
+                .trim();
+
+            fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(kueriBersih)}&limit=1`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data && data.length > 0) {
+                        const lat = parseFloat(data[0].lat);
+                        const lon = parseFloat(data[0].lon);
+                        map.flyTo([lat, lon], 17);
+                    } else {
+                        alert("Alamat tidak ditemukan. Coba masukkan nama jalan utama atau nama kelurahan/kecamatan saja.");
+                    }
+                }).catch(() => {
+                    alert("Koneksi bermasalah. Silakan periksa jaringan internet Anda.");
+                });
+        }
+
+        function lacakNamaJalanOtomatis(lat, lng) {
+            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data && data.display_name) {
+                        const namaJalanUtama = data.address.road || data.address.suburb || data.address.village || "Lokasi Terpilih";
+                        const fullAlamat = data.display_name;
+
+                        document.getElementById('alamatSaranTitle').innerText = namaJalanUtama;
+                        document.getElementById('alamatSaranSub').innerText = fullAlamat;
+                        document.getElementById('displayJalanHead').innerText = namaJalanUtama;
+                        document.getElementById('displayJalanDetail').innerText = fullAlamat;
+                    }
+                }).catch(() => {
+                    document.getElementById('alamatSaranTitle').innerText = "Lokasi Kustom";
+                    document.getElementById('alamatSaranSub').innerText = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+                });
+        }
+
+        function simpanAlamatKeBrowser() {
+            const koordinatRaw = document.getElementById('koordinat').value.split(',');
+
+            if (!koordinatRaw[0] || !koordinatRaw[1]) {
+                alert("Silakan geser peta, cari alamat, atau gunakan tombol Lokasi Saya terlebih dahulu.");
+                return;
+            }
+
+            const dataAlamat = {
+                lat: parseFloat(koordinatRaw[0]),
+                lng: parseFloat(koordinatRaw[1]),
+                nama: document.getElementById('nama').value,
+                whatsapp: document.getElementById('whatsapp').value,
+                detail: document.getElementById('alamat').value
+            };
+
+            if (!dataAlamat.nama || !dataAlamat.whatsapp || !dataAlamat.detail) {
+                alert("Lengkapi kolom Nama, WhatsApp, dan Detail Rumah terlebih dahulu!");
+                return;
+            }
+
+            localStorage.setItem('alamat_rumah_user', JSON.stringify(dataAlamat));
+
+            const badge = document.getElementById('statusSimpanBadge');
+            badge.innerText = "Alamat Tersimpan";
+            badge.style.background = "#e6fffa";
+            badge.style.color = "#319795";
+            badge.style.borderColor = "#319795";
+
+            alert("Alamat rumah berhasil disimpan secara permanen di browser ini!");
+        }
+
+        function sinkronisasiDataKontak() {
+            const nama = document.getElementById('nama').value || 'Nama Pelanggan';
+            const wa = document.getElementById('whatsapp').value || 'No. WhatsApp';
+            const detail = document.getElementById('alamat').value || 'Belum diisi';
+            document.getElementById('displayNamaKontak').innerHTML = `<strong>${nama}</strong> | ${wa}<br><span style="font-size:0.85rem; color:#888;">Detail: ${detail}</span>`;
+        }
+
+        function loadCheckoutData() {
+            try {
+                produkCheckout = JSON.parse(localStorage.getItem('produk_checkout'));
+                if (produkCheckout && produkCheckout.name && produkCheckout.price) {
+                    document.getElementById('checkoutNama').innerText = produkCheckout.name;
+                    document.getElementById('checkoutHarga').innerText = `Rp ${parseInt(produkCheckout.price).toLocaleString('id-ID')}`;
+                    if (produkCheckout.image) document.getElementById('checkoutImg').src = produkCheckout.image;
+                } else {
+                    produkCheckout = { name: "Kue Spesial Mawar Sari", price: 150000 };
+                }
+            } catch (e) {
+                produkCheckout = { name: "Kue Spesial Mawar Sari", price: 150000 };
+            }
+            initMap();
+        }
+
+        function kirimPesananWhatsApp(event) {
+            event.preventDefault();
+            const nP = document.getElementById('nama').value;
+            const wP = document.getElementById('whatsapp').value;
+            const tP = document.getElementById('displayJalanDetail').innerText;
+            const dA = document.getElementById('alamat').value;
+            const koor = document.getElementById('koordinat').value || `${defaultLat}, ${defaultLng}`;
+            const cat = document.getElementById('catatan').value || '-';
+            const linkMaps = `https://www.google.com/maps?q=${koor.replace(/\s+/g, '')}`;
+            const teksPesan = `*PESANAN BARU - MAWAR SARI BAKERY & CAKE*\n---------------------------------------------\n*Detail Pengiriman:*\n• Nama: ${nP}\n• WA: ${wP}\n• Peta: ${tP}\n• Detail Rumah: ${dA}\n• Google Maps: ${linkMaps}\n\n*Produk:*\n• Nama: ${produkCheckout.name}\n• Total: Rp ${parseInt(produkCheckout.price).toLocaleString('id-ID')}\n\n*Catatan:*\n"${cat}"`;
+            window.open(`https://wa.me/6281292330422?text=${encodeURIComponent(teksPesan)}`, '_blank');
+        }
+
+        window.onload = loadCheckoutData;
+    </script>
+</body>
+</html>

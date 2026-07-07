@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mawar Sari Bakery & Cake - Premium Quality</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- GOOGLE FONTS -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&family=Playfair+Display:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
+    <!-- FONT AWESOME (IKON) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- AOS ANIMATION CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+</head>
+<body>
+
+    <!-- NAVIGATION BAR -->
+    <div class="navbar">
+        <div class="logo">Mawar Sari Bakery & Cake</div>
+        <ul class="nav-links">
+            <li><a href="#home">Home</a></li>
+            <li><a href="#tentang">Tentang Kami</a></li>
+            <li><a href="#produk">Produk</a></li>
+            <li><a href="#kontak">Hubungi Kami</a></li>
+        </ul>
+    </div>
+
+    <!-- HERO SECTION -->
+    <div id="home" class="hero-section">
+        <div class="hero-content">
+            <h1>Kelembutan Autentik<br> Mawar Sari Bakery & Cake</h1>
+            <p>Menghadirkan kebahagian roti segar dan kue ulang tahun premium pilihan keluarga yang dibuat dengan penuh cinta setiap hari</p>
+            <a href="#produk" class="btn-primary">Lihat Menu</a>
+        </div>
+    </div>
+
+    <!-- TENTANG KAMI -->
+    <div id="tentang" class="section-container bg-light">
+        <h2>Kemurnian Rasa di Setiap Gigitan</h2>
+        <div class="grid-features">
+            <div class="feature-card">
+                <h3>Bahan Premium Pilihan</h3>
+                <p>Kami hanya menggunakan mentega murni berkualitas tinggi, cokelat pilihan, dan bahan alami tanpa kompromi untuk menciptakan kelezatan yang autentik.</p>
+            </div>
+            <div class="feature-card">
+                <h3>Dipanggang Segar Setiap Hari</h3>
+                <p>Menjamin kelembutan maksimal dan aroma panggangan yang menggugah selera langsung dari oven kami menuju ke meja hidangan Anda.</p>
+            </div>
+            <div class="feature-card">
+                <h3>Kualitas Cita Rasa Bintang Lima</h3>
+                <p>Menghadirkan harmoni rasa kue kelas dunia dengan sentuhan penuh kasih, menciptakan kemewahan kuliner yang dapat dinikmati semua kalangan.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECTION PRODUK BEST SELLER (SEKARANG SATU KARTU SLIDER) -->
+    <section id="produk" class="product-section">
+        <div class="container">
+            <h2 class="section-title">Produk Best Seller</h2>
+            <p class="section-subtitle">Varian paling favorit yang paling sering diburu pelanggan setia kami.</p>
+            
+            <!-- Tempat menampilkan SATU KARTU melayang yang akan berganti otomatis -->
+            <div style="display: flex; justify-content: center; padding: 20px;">
+                <div class="product-card" id="sliderCardContainer" style="width: 350px; position: relative; transition: opacity 0.3s ease-in-out;">
+                    <!-- Konten di dalam sini akan diisi & diganti otomatis oleh JavaScript -->
+                </div>
+            </div>
+
+            <!-- TOMBOL DIALIHKAN KE HALAMAN SEMUA MENU -->
+            <div class="see-all-container">
+                <p>Mau lihat varian roti dan kue lezat lainnya?</p>
+                <a href="menu.html" class="btn-secondary">Lihat Semua List Kue ➡️</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- KONTAK & FOOTER -->
+    <div id="kontak" class="footer-section">
+        <h2>Tertarik Mencoba?</h2>
+        <p>Pesan sekarang juga melalui WhatsApp untuk mendapatkan promo gratis ongkir minggu ini!</p>
+        <a href="https://wa.me/6281292330422?text=Halo%20Mawar%20Sari,%20saya%20mau%20order" target="_blank" class="btn-whatsapp">
+            💬 Order Lewat WhatsApp
+        </a>
+        <p class="copyright">© 2026 Mawar Sari Bakery & Cake. All Rights Reserved.</p>
+    </div>
+
+    <!-- JAVASCRIPT: NAVBAR TRANSPARAN → SOLID SAAT SCROLL -->
+    <script>
+        window.addEventListener('scroll', function () {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 30) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+    </script>
+
+    <!-- JAVASCRIPT LOGIKA AUTOMATIC SLIDER -->
+    <script>
+        let bestSellerProducts = [];
+        let indeksSekarang = 0;
+
+        function initBestSellerSlider() {
+            const cardContainer = document.getElementById('sliderCardContainer');
+            if (!cardContainer) return;
+
+            let customMenu = JSON.parse(localStorage.getItem('umkm_menu')) || [];
+            
+            // Filter hanya produk Best Seller
+            bestSellerProducts = customMenu.filter(item => item.isBestSeller === true);
+
+            if (bestSellerProducts.length === 0) {
+                cardContainer.parentElement.innerHTML = `<p style="text-align:center; color:#888;">Belum ada produk Best Seller yang dipilih.</p>`;
+                return;
+            }
+
+            // Tampilkan kartu pertama saat pertama kali halaman dibuka
+            renderKartuSatuSaja();
+
+            // Set waktu otomatis ganti kartu setiap 4000 milidetik (4 detik) seperti Shopee
+            setInterval(gantiKueOtomatis, 4000);
+        }
+
+        function renderKartuSatuSaja() {
+            const cardContainer = document.getElementById('sliderCardContainer');
+            if (!cardContainer) return;
+
+            const item = bestSellerProducts[indeksSekarang];
+
+            let hargaTampilan = `<p class="product-price">Rp ${parseInt(item.price).toLocaleString('id-ID')}</p>`;
+            if (item.isPromo && item.promoPrice) {
+                hargaTampilan = `
+                    <p class="product-price" style="color: #e74c3c; font-weight: bold;">Rp ${parseInt(item.promoPrice).toLocaleString('id-ID')}</p>
+                    <p style="text-decoration: line-through; color: #888; font-size: 14px; margin-top: -5px;">Rp ${parseInt(item.price).toLocaleString('id-ID')}</p>
+                `;
+            }
+
+            // Render struktur HTML satu kartu lengkap dengan Indikator Angka (misal: 1/3) di pojok kanan atas
+            cardContainer.innerHTML = `
+                <span class="badge-laris">Best Seller</span>
+                <span class="slider-number" style="position: absolute; top: 15px; right: 15px; background: rgba(0,0,0,0.5); color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: 500;">${indeksSekarang + 1}/${bestSellerProducts.length}</span>
+                <img src="${item.image || 'default-kue.jpg'}" alt="${item.name}" class="product-img">
+                <div class="product-info">
+                    <h3>${item.name}</h3>
+                    ${hargaTampilan}
+                    <p class="product-desc">${item.desc || 'Tidak ada deskripsi.'}</p>
+                    
+                    <div class="shopee-actions">
+                        <button class="btn-icon btn-chat" onclick="window.open('https://wa.me/6281292330422?text=Halo%20Admin%20Mawar%20Sari,%20saya%20ingin%20tanya%20tentang%20kue%20${encodeURIComponent(item.name)}', '_blank')" title="Chat Admin">
+                            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12c0 2.02.6 3.9 1.63 5.48L2.05 22l4.7-.93C8.16 21.65 9.99 22 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm1 14h-2v-2h2v2zm0-4h-2V7h2v5z"/></svg>
+                        </button>
+                        
+                        <button class="btn-icon btn-cart" onclick="alert('Berhasil menambahkan 1 Pcs ${item.name} ke keranjang!')" title="Tambah ke Keranjang">
+                            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+                        </button>
+                        
+                        <button class="btn-checkout" onclick="prosesBeli('${item.name}')">Beli Sekarang</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function gantiKueOtomatis() {
+            indeksSekarang = (indeksSekarang + 1) % bestSellerProducts.length;
+            
+            const cardContainer = document.getElementById('sliderCardContainer');
+            if (cardContainer) {
+                cardContainer.style.opacity = '0'; // Efek animasi menghilang (fade out)
+                setTimeout(() => {
+                    renderKartuSatuSaja();
+                    cardContainer.style.opacity = '1'; // Efek animasi muncul kembali (fade in)
+                }, 300);
+            } else {
+                renderKartuSatuSaja();
+            }
+        }
+        
+        // REVISI TOTAL: Menyimpan data ke localStorage demi menghindari limitasi URL (HTTP ERROR 431) akibat gambar base64
+        function prosesBeli(namaKue) {
+            const produkDipilih = bestSellerProducts.find(item => item.name === namaKue);
+            
+            let hargaAplikasi = produkDipilih.price;
+            if (produkDipilih.isPromo && produkDipilih.promoPrice) {
+                hargaAplikasi = produkDipilih.promoPrice;
+            }
+            
+            const dataCheckout = {
+                name: produkDipilih.name,
+                price: hargaAplikasi,
+                image: produkDipilih.image || 'default-kue.jpg'
+            };
+            
+            localStorage.setItem('produk_checkout', JSON.stringify(dataCheckout));
+            window.location.href = 'checkout.html';
+        }
+
+        window.onload = initBestSellerSlider;
+    </script>
+
+    <!-- LOADING ANIMATION -->
+    <div id="loader">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- TOMBOL SCROLL TO TOP -->
+    <button id="scrollTopBtn" title="Kembali ke atas"><i class="fas fa-arrow-up"></i></button>
+
+    <!-- TOMBOL WHATSAPP MENGAMBANG -->
+    <a href="https://wa.me/6281292330422?text=Halo%20Mawar%20Sari,%20saya%20mau%20tanya%20seputar%20kue" class="floating-wa" target="_blank" title="Chat WhatsApp">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+
+    <!-- AOS JAVASCRIPT INISIALISASI -->
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    <script>
+        // Jalankan animasi scroll (AOS)
+        AOS.init({
+            once: true // Animasi hanya berjalan sekali saat di-scroll kebawah
+        });
+
+        // Logika Loading Screen
+        window.addEventListener('load', function() {
+            const loader = document.getElementById('loader');
+            loader.style.opacity = '0';
+            setTimeout(() => { loader.style.display = 'none'; }, 500);
+        });
+
+        // Logika Scroll To Top Button
+        const scrollTopBtn = document.getElementById('scrollTopBtn');
+        window.addEventListener('scroll', function() {
+            if (window.scrollY > 300) {
+                scrollTopBtn.classList.add('show');
+            } else {
+                scrollTopBtn.classList.remove('show');
+            }
+        });
+        scrollTopBtn.addEventListener('click', function() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    </script> 
+</body>
+</html>

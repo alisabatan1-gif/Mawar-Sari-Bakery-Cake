@@ -1,0 +1,444 @@
+/* --- CSS RESET & DASAR --- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Inter, Segoe UI, Tahoma, 'geneva', Verdana, sans-serif";
+    scroll-behavior: smooth;
+}
+
+body {
+    background-color: #121212;
+    color: #f5f5f5;
+    background: radial-gradient(circle, #1a1a1a 40%, #0d0d0d 100%);
+    min-height: 100vh;
+    margin: 0;
+}
+
+/* --- NAVIGATION BAR --- */
+.navbar {
+    background-color: transparent;
+    padding: 20px 5%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    box-shadow: none;
+    z-index: 1000;
+    transition: "background-color 0.35s ease, box-shadow 0.35s ease, padding 0.35s ease";
+}
+
+.navbar.scrolled {
+    background-color: rgba(18,18,18,0.95);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+    padding: 12px 55px;
+}
+
+.logo {
+    font-weight: bold;
+    font-size: 20px;
+    color: #fff;
+    transition: color 0.35s ease;
+}
+.navbar.scrolled .logo { 
+    color: #ffffff; 
+}
+
+.nav-links { display: flex; list-style: none; }
+.nav-links li { margin-left: 20px; }
+.nav-links a {
+    text-decoration: none;
+    color: #fff;
+    font-weight: 500;
+    transition: color 0.3s;
+}
+.navbar.scrolled .nav-links a { 
+    color: #ffffff !important; 
+}
+.nav-links a:hover { color: #e67e22; }
+
+/* --- HERO SECTION --- */
+.hero-section {
+    background-color: #fcfaf2;
+    background-image: linear-gradient(180deg, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0.7) 100%), url(toko.jpeg);
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    height: 92vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: white;
+    padding: 0 20px;
+    margin-top: 0;
+}
+
+.hero-content { max-width: 700px; padding: 20px; z-index: 2; }
+
+.hero-content::before {
+    content: '';
+    display: block;
+    width: 60px;
+    height: 3px;
+    background: #d35400;
+    margin: 0 auto 25px auto;
+}
+
+.hero-content h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 3.2rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    line-height: 1.3;
+    margin-bottom: 20px;
+    text-shadow: 2px 3px 6px rgba(0,0,0,0.8);
+}
+
+.hero-content p {
+    font-family: 'Inter', sans-serif;
+    font-weight: 300;
+    font-size: 1.15rem;
+    line-height: 1.8;
+    margin-bottom: 35px;
+    color: #f5e6d8;
+}
+
+/* --- TOMBOL-TOMBOL --- */
+.btn-primary {
+    display: inline-block;
+    background-color: transparent;
+    color: white;
+    border: 2px solid #d35400;
+    padding: 14px 38px;
+    text-decoration: none;
+    border-radius: 25px;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+    transition: all 0.35s ease;
+}
+.btn-primary:hover {
+    background-color: #d35400;
+    box-shadow: 0 10px 25px rgba(211,84,0,0.4);
+    transform: translateY(-3px);
+}
+
+.btn-whatsapp {
+    display: inline-block;
+    background-color: #25d366;
+    color: white;
+    padding: 15px 35px;
+    text-decoration: none;
+    border-radius: 30px;
+    font-weight: bold;
+    font-size: 18px;
+    margin-top: 20px;
+    box-shadow: 0 8px 20px rgba(37,211,102,0.3);
+    transition: all 0.3s ease;
+}
+.btn-whatsapp:hover {
+    background-color: #20ba5a;
+    transform: translateY(-3px);
+    box-shadow: 0 12px 28px rgba(37,211,102,0.4);
+}
+
+/* --- GRID & SECTION --- */
+.section-container { padding: 80px 10%; text-align: center; }
+.bg-light { background-color: #fdf8f2; }
+
+.section-container h2,
+.section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.2rem;
+    color: #2c2c2c;
+    margin-bottom: 15px;
+    position: relative;
+}
+.section-container h2::after,
+.section-title::after {
+    content: '';
+    display: block;
+    width: 50px;
+    height: 3px;
+    background: #d35400;
+    margin: 15px auto 0 auto;
+}
+.section-subtitle {
+    color: #888;
+    font-size: 1rem;
+    margin-bottom: 40px;
+}
+
+.grid-features { display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; margin-top: 40px; }
+.feature-card {
+    background: white;
+    padding: 30px;
+    border-radius: 14px;
+    width: 280px;
+    text-align: left;
+    border: 1px solid #f2e6da;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+    transition: 0.3s;
+}
+.feature-card:hover { transform: translateY(-8px); box-shadow: 0 12px 30px rgba(211,84,0,0.12); }
+.feature-card h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.15rem;
+    margin-bottom: 10px;
+    color: #d35400;
+}
+.feature-card p {
+    color: #777;
+    font-size: 0.92rem;
+    line-height: 1.7;
+}
+
+/* --- KARTU PRODUK & SHOPEE STYLE --- */
+.product-section { padding: 60px 20px; background-color: #fcfcfc; text-align: center; }
+.product-grid { display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; max-width: 1100px; margin: 0 auto; }
+
+.product-card {
+    background: white;
+    border-radius: 18px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+    width: 300px;
+    overflow: hidden;
+    position: relative;
+    text-align: left;
+    transition: 0.3s;
+}
+.product-card:hover {
+    box-shadow: 0 15px 35px rgba(211,84,0,0.15);
+    transform: translateY(-6px);
+}
+.badge-laris {
+    position: absolute; top: 15px; left: 15px; background: #e74c3c; color: white;
+    padding: 5px 10px; font-size: 0.8rem; font-weight: bold; border-radius: 20px;
+}
+.product-img { width: 100%; height: 220px; object-fit: cover; }
+.product-info { padding: 20px; }
+.product-info h3 {
+    font-family: 'Playfair Display', serif;
+    margin-bottom: 8px;
+    font-size: 1.2rem;
+}
+.product-desc { font-size: 0.85rem; color: #666; height: 50px; overflow: hidden; margin-bottom: 10px; }
+.product-price {
+    font-family: 'Inter', sans-serif;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #d35400;
+    margin-bottom: 15px;
+}
+
+/* --- STYLE TOMBOL SHOPEE --- */
+.shopee-actions { display: flex; align-items: center; gap: 8px; border-top: 1px solid #f2f2f2; padding-top: 15px; }
+
+.btn-icon {
+    display: flex; align-items: center; justify-content: center;
+    width: 44px; height: 44px; background-color: #fff5f0;
+    border: 1px solid #e67e22; color: #e67e22;
+    border-radius: 8px; cursor: pointer; transition: 0.2s;
+}
+.btn-icon:hover { background-color: #fdece2; transform: translateY(-2px); }
+
+.btn-checkout {
+    flex: 1; height: 44px; background-color: #e67e22; color: white;
+    border: none; border-radius: 8px; font-size: 0.95rem; font-weight: bold;
+    cursor: pointer; transition: 0.2s;
+}
+.btn-checkout:hover { background-color: #d35400; transform: translateY(-2px); }
+
+/* --- FOOTER --- */
+.footer-section {
+    background: linear-gradient(180deg, #2c3e50 0%, #1a252f 100%);
+    color: white;
+    padding: 60px 20px;
+    text-align: center;
+    position: relative;
+}
+.footer-section h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    margin-bottom: 15px;
+}
+.footer-section p {
+    color: #cfd8dc;
+    max-width: 500px;
+    margin: 0 auto 15px auto;
+}
+.copyright { margin-top: 40px; font-size: 12px; color: #7f8c8d; }
+.see-all-container { margin-top: 50px; }
+.btn-secondary {
+    display: inline-block; background: #2c3e50; color: white;
+    padding: 12px 25px; border-radius: 25px; text-decoration: none; font-weight: bold;
+    transition: 0.3s;
+}
+.btn-secondary:hover { background: #1a252f; transform: translateY(-2px); }
+
+/* ============================================= */
+/* ===== UPGRADE SECTION "PRODUK BEST SELLER" === */
+/* ============================================= */
+
+.product-section {
+    padding: 100px 20px;
+    background: linear-gradient(180deg, #fcfcfc 0%, #fdf8f2 100%);
+}
+
+.see-all-container {
+    margin-top: 50px;
+    padding-top: 30px;
+    border-top: 1px solid #f0e0cf;
+}
+
+.see-all-container p {
+    color: #888;
+    margin-bottom: 15px;
+    font-size: 0.95rem;
+}
+
+.btn-secondary {
+    background: transparent;
+    border: 2px solid #2c3e50;
+    color: #2c3e50;
+    padding: 12px 28px;
+    letter-spacing: 0.3px;
+    transition: all 0.3s ease;
+}
+.btn-secondary:hover {
+    background: #2c3e50;
+    color: white;
+    box-shadow: 0 10px 25px rgba(44,62,80,0.25);
+    transform: translateY(-3px);
+}
+
+/* Badge nomor slider (1/3) lebih elegan */
+.slider-number {
+    backdrop-filter: blur(4px);
+}
+
+/* Badge "Best Seller" lebih menonjol */
+.badge-laris {
+    box-shadow: 0 4px 12px rgba(231,76,60,0.35);
+    letter-spacing: 0.3px;
+}
+
+/* ============================================= */
+/* ===== UPGRADE FOOTER — LEBIH MEWAH =========== */
+/* ============================================= */
+
+.footer-section {
+    padding: 90px 20px 50px 20px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Garis dekoratif atas footer */
+.footer-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 3px;
+    background: #d35400;
+}
+
+.footer-section h2 {
+    letter-spacing: 0.5px;
+}
+
+.footer-section p {
+    line-height: 1.7;
+}
+
+.footer-section .copyright {
+    border-top: 1px solid rgba(255,255,255,0.08);
+    padding-top: 25px;
+    margin-top: 45px;
+    letter-spacing: 0.3px;
+}
+
+/* ============================================= */
+/* ===== FITUR INTERAKTIF MODERN (MAMBA) ======= */
+/* ============================================= */
+
+/* 1. Navbar Sticky dengan Efek Blur */
+.navbar.scrolled {
+    background-color: rgba(255, 255, 255, 0.85); /* Transparan putih */
+    backdrop-filter: blur(12px); /* Efek kaca blur premium */
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 4px 20px rgba(139, 115, 85, 0.06);
+}
+
+/* 2. Loading Screen Animation */
+#loader {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background-color: #fcfaf2;
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: opacity 0.5s ease;
+}
+.spinner {
+    width: 50px; height: 50px;
+    border: 5px solid rgba(176, 130, 87, 0.2);
+    border-top-color: #d35400;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* 3. Tombol WhatsApp Mengambang */
+.floating-wa {
+    position: fixed;
+    bottom: 30px; right: 30px;
+    background-color: #25d366;
+    color: white;
+    width: 60px; height: 60px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 32px;
+    box-shadow: 0 8px 25px rgba(37, 211, 102, 0.4);
+    z-index: 999;
+    transition: all 0.3s ease;
+}
+.floating-wa:hover {
+    transform: scale(1.1) translateY(-5px);
+    background-color: #20ba5a;
+}
+
+/* 4. Tombol Scroll to Top */
+#scrollTopBtn {
+    position: fixed;
+    bottom: 105px; right: 35px;
+    background-color: #b08257;
+    color: white;
+    border: none;
+    width: 45px; height: 45px;
+    border-radius: 50%;
+    font-size: 18px;
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    z-index: 998;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+#scrollTopBtn.show {
+    opacity: 1;
+    visibility: visible;
+}
+#scrollTopBtn:hover {
+    background-color: #d35400;
+    transform: translateY(-3px);
+}
