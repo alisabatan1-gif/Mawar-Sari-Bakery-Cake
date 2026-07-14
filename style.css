@@ -15,7 +15,9 @@ body {
     margin: 0;
 }
 
-/* --- NAVIGATION BAR --- */
+/* ==========================================================================
+   --- NAVIGATION BAR (SEBELUM DI-SCROLL / DI PALING ATAS) ---
+   ========================================================================== */
 .navbar {
     background-color: transparent;
     padding: 20px 5%;
@@ -27,37 +29,75 @@ body {
     top: 0;
     box-shadow: none;
     z-index: 1000;
-    transition: "background-color 0.35s ease, box-shadow 0.35s ease, padding 0.35s ease";
-}
-
-.navbar.scrolled {
-    background-color: rgba(18,18,18,0.95);
-    box-shadow: 0 4px 20px rgba(0,0,0,0.04);
-    padding: 12px 55px;
+    /* Perbaikan: Menghilangkan tanda kutip agar efek transisi transparan ke putih berjalan mulus */
+    transition: background-color 0.35s ease, box-shadow 0.35s ease, padding 0.35s ease;
 }
 
 .logo {
     font-weight: bold;
     font-size: 20px;
-    color: #fff;
+    color: #ffffff; /* Warna awal putih */
     transition: color 0.35s ease;
 }
-.navbar.scrolled .logo { 
-    color: #ffffff; 
+
+.menu-toggle {
+    display: none;
+    font-size: 30px;
+    color: #ffffff; /* Warna awal tombol hamburger putih */
+    cursor: pointer;
+    transition: color 0.35s ease;
 }
 
-.nav-links { display: flex; list-style: none; }
-.nav-links li { margin-left: 20px; }
+.nav-links { 
+    display: flex; 
+    list-style: none; 
+}
+
+.nav-links li { 
+    margin-left: 20px; 
+}
+
 .nav-links a {
     text-decoration: none;
-    color: #fff;
+    color: #ffffff; /* Warna awal menu link putih */
     font-weight: 500;
     transition: color 0.3s;
 }
-.navbar.scrolled .nav-links a { 
-    color: #ffffff !important; 
+
+.nav-links a:hover { 
+    color: #e67e22; 
 }
-.nav-links a:hover { color: #e67e22; }
+
+/* ==========================================================================
+   --- NAVIGATION BAR (SETELAH DI-SCROLL KE BAWAH) ---
+   ========================================================================== */
+.navbar.scrolled {
+    background-color: rgba(255, 255, 255, 0.92) !important; /* Latar putih vanilla dengan blur premium */
+    backdrop-filter: blur(12px); 
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 4px 20px rgba(139, 115, 85, 0.12);
+    padding: 12px 5%; /* Menyesuaikan padding agar terlihat kokoh dan simetris */
+}
+
+/* Mengubah warna Logo menjadi Cokelat Tua agar kontras dengan warna putih vanilla */
+.navbar.scrolled .logo { 
+    color: #2c1d11 !important; 
+}
+
+/* Mengubah warna tombol hamburger menu di HP menjadi Cokelat Tua */
+.navbar.scrolled .menu-toggle {
+    color: #2c1d11 !important;
+}
+
+/* Mengubah warna teks Link Menu menjadi Cokelat Tua */
+.navbar.scrolled .nav-links a { 
+    color: #2c1d11 !important; 
+}
+
+/* Warna hover link menu saat sudah di-scroll */
+.navbar.scrolled .nav-links a:hover {
+    color: #d35400 !important;
+}
 
 /* --- HERO SECTION --- */
 .hero-section {
@@ -366,14 +406,6 @@ body {
 /* ===== FITUR INTERAKTIF MODERN (MAMBA) ======= */
 /* ============================================= */
 
-/* 1. Navbar Sticky dengan Efek Blur */
-.navbar.scrolled {
-    background-color: rgba(255, 255, 255, 0.85); /* Transparan putih */
-    backdrop-filter: blur(12px); /* Efek kaca blur premium */
-    -webkit-backdrop-filter: blur(12px);
-    box-shadow: 0 4px 20px rgba(139, 115, 85, 0.06);
-}
-
 /* 2. Loading Screen Animation */
 #loader {
     position: fixed;
@@ -447,74 +479,73 @@ body {
    RESPONSIVE HP
 ========================= */
 @media screen and (max-width: 768px) {
-
-    .navbar{
+    .navbar {
         flex-direction: column;
         padding: 15px;
     }
 
-    .logo{
+    .logo {
         margin-bottom: 10px;
         font-size: 18px;
         text-align: center;
     }
 
-    .nav-links{
+    .nav-links {
         flex-direction: column;
         align-items: center;
         gap: 12px;
         width: 100%;
     }
 
-    .nav-links li{
+    .nav-links li {
         margin-left: 0;
     }
 
-    .hero-section{
+    .hero-section {
         height: auto;
         padding: 120px 20px 70px;
     }
 
-    .hero-content h1{
+    .hero-content h1 {
         font-size: 2rem;
     }
 
-    .hero-content p{
+    .hero-content p {
         font-size: 1rem;
     }
 
-    .section-container{
+    .section-container {
         padding: 60px 20px;
     }
 
-    .grid-features{
+    .grid-features {
         flex-direction: column;
         align-items: center;
     }
 
-    .feature-card{
+    .feature-card {
         width: 100%;
         max-width: 350px;
     }
 
-    .product-grid{
+    .product-grid {
         flex-direction: column;
         align-items: center;
     }
 
-    .product-card{
+    .product-card {
         width: 100%;
         max-width: 350px;
     }
 
     .btn-primary,
     .btn-secondary,
-    .btn-whatsapp{
+    .btn-whatsapp {
         width: 100%;
         text-align: center;
     }
 
-    .floating-wa{
+    .floating-wa {
         width: 55px;
         height: 55px;
         font-size: 28px;
@@ -522,81 +553,87 @@ body {
         right: 20px;
     }
 
-    #scrollTopBtn{
+    #scrollTopBtn {
         bottom: 90px;
         right: 25px;
     }
 
-    img{
+    img {
         max-width: 100%;
         height: auto;
     }
-
 }
 
-.menu-toggle{
-    display:none;
-    font-size:30px;
-    color:white;
-    cursor:pointer;
+.menu-toggle {
+    display: none;
+    font-size: 30px;
+    color: white;
+    cursor: pointer;
 }
 
 @media (max-width:768px){
-
-    .navbar{
-        display:flex;
-        justify-content:space-between;
-        align-items:center;
-        padding:15px 20px;
+    .navbar {
+        display: flex;
+        flex-direction: row; /* Menjaga logo & hamburger sejajar di mobile */
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 20px;
     }
 
-    .logo{
-        font-size:18px;
+    .logo {
+        font-size: 18px;
+        margin-bottom: 0;
     }
 
-    .menu-toggle{
-        display:block;
+    .menu-toggle {
+        display: block;
     }
 
-    .nav-links{
-        display:none;
-        flex-direction:column;
-        position:absolute;
-        top:70px;
-        left:0;
-        width:100%;
-        background:#1a1a1a;
-        padding:20px 0;
+    .nav-links {
+        display: none;
+        flex-direction: column;
+        position: absolute;
+        top: 70px;
+        left: 0;
+        width: 100%;
+        background: #1a1a1a;
+        padding: 20px 0;
     }
 
-    .nav-links.active{
-        display:flex;
+    .nav-links.active {
+        display: flex;
     }
 
-    .nav-links li{
-        margin:15px 0;
-        text-align:center;
+    .nav-links li {
+        margin: 15px 0;
+        text-align: center;
+    }
+    
+    /* Perbaikan: Agar menu responsif HP juga ikut berubah warna gelap di background putih */
+    .navbar.scrolled .nav-links {
+        background: #fdf8f2;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
     }
 
-    .hero-section{
-        height:auto;
-        padding:120px 20px 80px;
+    .hero-section {
+        height: auto;
+        padding: 120px 20px 80px;
     }
 
-    .hero-content h1{
-        font-size:2.2rem;
-        line-height:1.2;
+    .hero-content h1 {
+        font-size: 2.2rem;
+        line-height: 1.2;
     }
 
-    .hero-content p{
-        font-size:1rem;
+    .hero-content p {
+        font-size: 1rem;
     }
 
-    .product-card{
-        width:95%;
+    .product-card {
+        width: 95%;
     }
 
-    .feature-card{
-        width:100%;
+    .feature-card {
+        width: 100%;
     }
 }

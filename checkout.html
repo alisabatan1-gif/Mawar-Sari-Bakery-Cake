@@ -44,14 +44,12 @@
 
         .checkout-container {
             max-width: 1100px;
-            height: calc(100hv-700px);
-            margin: 90px auto 0 auto;
+            margin: 90px auto 30px auto;
             padding: 15px;
             display: grid;
             grid-template-columns: 1.2fr 0.8fr;
-            gap: 12px;
+            gap: 20px;
             box-sizing: border-box;
-            overflow: hidden;
         }
         @media (max-width: 768px) {
             .checkout-container { grid-template-columns: 1fr; margin-top: 70px; padding: 10px; }
@@ -64,8 +62,6 @@
             padding: 25px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.05);
             box-sizing: border-box;
-            overflow-y: auto;
-            height: 100%;
         }
 
         .shopee-address-selector {
@@ -146,7 +142,7 @@
         .shopee-map-area {
             position: relative;
             width: 100%;
-            height: 160px;
+            height: 220px;
             border-bottom: 1px solid #eee;
             background: #e5e3df;
         }
@@ -397,7 +393,7 @@
 
             map.on('moveend', function () {
                 const posisiTengah = map.getCenter();
-                document.getElementById('koordinat').value = `${posisiTengah.lat.toFixed(6)}, ${posisiTengah.lng.toFixed(6)}`;
+                document.getElementById('koordinat').value = `${posisiTengah.lat.toFixed(6)},${posisiTengah.lng.toFixed(6)}`;
 
                 clearTimeout(timerGeocode);
                 timerGeocode = setTimeout(() => {
@@ -554,9 +550,12 @@
             const wP = document.getElementById('whatsapp').value;
             const tP = document.getElementById('displayJalanDetail').innerText;
             const dA = document.getElementById('alamat').value;
-            const koor = document.getElementById('koordinat').value || `${defaultLat}, ${defaultLng}`;
+            const koor = document.getElementById('koordinat').value || `${defaultLat},${defaultLng}`;
             const cat = document.getElementById('catatan').value || '-';
+            
+            // Perbaikan URL Google Maps resmi memakai parameter ?q=koordinat
             const linkMaps = `https://www.google.com/maps?q=${koor.replace(/\s+/g, '')}`;
+            
             const teksPesan = `*PESANAN BARU - MAWAR SARI BAKERY & CAKE*\n---------------------------------------------\n*Detail Pengiriman:*\n• Nama: ${nP}\n• WA: ${wP}\n• Peta: ${tP}\n• Detail Rumah: ${dA}\n• Google Maps: ${linkMaps}\n\n*Produk:*\n• Nama: ${produkCheckout.name}\n• Total: Rp ${parseInt(produkCheckout.price).toLocaleString('id-ID')}\n\n*Catatan:*\n"${cat}"`;
             window.open(`https://wa.me/6281292330422?text=${encodeURIComponent(teksPesan)}`, '_blank');
         }

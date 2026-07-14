@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Admin UMKM</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f4f4; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .login-container { background: white; padding: 30px; border-radius: 8px; box-shadow: 0px 0px 10px rgba(0,0,0,0.1); width: 300px; }
+        h2 { text-align: center; margin-bottom: 20px; color: #333; }
+        .input-group { margin-bottom: 15px; }
+        .input-group label { display: block; margin-bottom: 5px; font-weight: bold; }
+        .input-group input { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        button { width: 100%; padding: 10px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; }
+        button:hover { background-color: #45a049; }
+        .error-msg { color: red; font-size: 14px; text-align: center; margin-top: 10px; display: none; }
+    </style>
+</head>
+<body>
+
+<div class="login-container">
+    <h2>Login Admin</h2>
+    <form id="loginForm">
+        <div class="input-group">
+            <label>Email</label>
+            <input type="email" id="email" required placeholder="admin@mawarsari.com">
+        </div>
+        <div class="input-group">
+            <label>Password</label>
+            <input type="password" id="password" required placeholder="******">
+        </div>
+        <button type="submit">Masuk</button>
+        <p class="error-msg" id="errorMsg">Email atau Password salah!</p>
+    </form>
+</div>
+
+<script>
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const emailInput = document.getElementById('email').value;
+        const passwordInput = document.getElementById('password').value;
+
+        // --- ATUR EMAIL & PASSWORD KAMU DI SINI ---
+        const validEmail = "admin@mawarsari.com";
+        const validPassword = "passwordrahasia123"; 
+
+        if (emailInput === validEmail && passwordInput === validPassword) {
+            // Jika benar, simpan status login ke Session Storage
+            sessionStorage.setItem('isAdminLoggedIn', 'true');
+            // Alihkan halaman ke admin.html
+            window.location.href = 'admin.html';
+        } else {
+            // Jika salah, tampilkan pesan error
+            document.getElementById('errorMsg').style.display = 'block';
+        }
+    });
+</script>
+
+</body>
+</html>
