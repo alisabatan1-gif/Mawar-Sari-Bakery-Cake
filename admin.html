@@ -3,125 +3,166 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Admin - Mawar Sari</title>
+    <title>Dashboard Admin Premium - Mawar Sari</title>
     <style>
         body { font-family: Arial, sans-serif; background-color: #f8f9fa; margin: 0; padding: 20px; }
         .admin-container { max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
         .form-group { margin-bottom: 15px; }
         .form-group label { display: block; margin-bottom: 5px; font-weight: bold; }
-        .form-group input, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+        .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
         .btn-submit { background-color: #e67e22; color: white; border: none; padding: 12px; width: 100%; font-size: 16px; font-weight: bold; border-radius: 5px; cursor: pointer; }
         .btn-submit:hover { background-color: #d35400; }
         .btn-cancel { background-color: #7f8c8d; color: white; border: none; padding: 12px; width: 100%; font-size: 16px; font-weight: bold; border-radius: 5px; cursor: pointer; margin-top: 10px; display: none; }
         .menu-list { margin-top: 30px; border-top: 2px solid #eee; padding-top: 20px; }
         .menu-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; background: #fafafa; border: 1px solid #ddd; margin-bottom: 10px; border-radius: 5px; }
+        .badge { padding: 3px 8px; background: #e67e22; color: white; border-radius: 3px; font-size: 11px; font-weight: bold; }
+        .badge.best { background: #e74c3c; }
+        .badge.tambahan { background: #7f8c8d; }
         .action-buttons { display: flex; gap: 5px; }
         .btn-edit { background-color: #3498db; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; }
-        .btn-edit:hover { background-color: #2980b9; }
         .btn-delete { background-color: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; }
-        .btn-delete:hover { background-color: #c0392b; }
+        #uploadStatus { font-size: 13px; color: #e67e22; font-weight: bold; margin-top: 5px; display: none; }
     </style>
 
-    <!-- LOAD SDK FIREBASE ONLINE -->
+    <!-- LOAD LENGKAP SDK FIREBASE (TERMASUK STORAGE UNTUK UPLOAD FOTO) -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
 </head>
 <body>
 
 <div class="admin-container">
     <h2 id="formTitle">Tambah Menu Kue Baru (Cloud Database)</h2>
     <form id="menuForm">
-        <!-- Input Tersembunyi Untuk Menyimpan ID Kue Saat Edit -->
         <input type="hidden" id="menuId">
+        <!-- Menyimpan URL foto lama agar saat edit tidak terhapus jika tidak upload ulang -->
+        <input type="hidden" id="oldImageUrl"> 
 
         <div class="form-group">
             <label>Nama Kue:</label>
             <input type="text" id="menuName" required placeholder="Contoh: Black Forest Premium">
         </div>
+        
         <div class="form-group">
             <label>Harga (Rp):</label>
             <input type="number" id="menuPrice" required placeholder="Contoh: 100000">
         </div>
+
+        <div class="form-group">
+            <label>Penempatan / Kategori Kue:</label>
+            <select id="menuKategori">
+                <option value="utama">Menu Utama (Katalog Biasa)</option>
+                <option value="best_seller">🔥 Best Seller (Rekomendasi Teratas)</option>
+                <option value="tambahan">Menu Tambahan</option>
+            </select>
+        </div>
+
         <div class="form-group">
             <label>Deskripsi Kue:</label>
-            <textarea id="menuDesc" rows="3" placeholder="Sebutkan varian rasa, ukuran, atau detail kue..."></textarea>
+            <textarea id="menuDesc" rows="3" placeholder="Sebutkan rasa, ukuran, dll..."></textarea>
         </div>
+
         <div class="form-group">
-            <label>URL Foto Kue (Link Gambar):</label>
-            <input type="text" id="menuImage" placeholder="Tempel link foto kue atau kosongkan untuk default">
+            <label>Upload Foto Kue langsung dari HP/Laptop:</label>
+            <input type="file" id="menuImageFile" accept="image/*">
+            <div id="uploadStatus">Memproses upload foto ke cloud... 0%</div>
         </div>
+
         <button type="submit" id="btnSubmitForm" class="btn-submit">🚀 Simpan & Tayangkan di Semua HP</button>
         <button type="button" id="btnCancelEdit" class="btn-cancel" onclick="resetToAddMode()">❌ Batal Edit</button>
     </form>
 
     <div class="menu-list">
-        <h3>Daftar Menu Tambahan Saat Ini (Live dari Cloud):</h3>
+        <h3>Daftar Menu Saat Ini (Live dari Cloud):</h3>
         <div id="liveMenuList">Memuat data kue...</div>
     </div>
 </div>
 
 <script>
-    // ==========================================
-    // SILAKAN MASUKKAN CONFIG FIREBASE KAMU DI SINI
-    // ==========================================
+    // CONFIG FIREBASE MILIK ALI SABATAN
     const firebaseConfig = {
-        apiKey: "AIzaSy...",
+        apiKey: "AIzaSyBV6z7KT4OM8QiopYoFbRUGI6248HEkE8w",
         authDomain: "mawar-sari-bakery.firebaseapp.com",
         databaseURL: "https://mawar-sari-bakery-default-rtdb.firebaseio.com",
         projectId: "mawar-sari-bakery",
-        storageBucket: "mawar-sari-bakery.appspot.com",
-        messagingSenderId: "...",
-        appId: "..."
+        storageBucket: "mawar-sari-bakery.firebasestorage.app",
+        messagingSenderId: "100804150468",
+        appId: "1:100804150468:web:fdb97e55881183f69d7591"
     };
     
-    // Inisialisasi Firebase
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
+    const storage = firebase.storage();
 
-    // Proteksi Halaman Login Sederhana
     if (sessionStorage.getItem('isAdminLoggedIn') !== 'true') {
         alert('Silakan login terlebih dahulu!');
         window.location.href = 'login.html';
     }
 
-    // Variabel lokal untuk menyimpan salinan data dari Firebase agar mudah diambil saat edit
     let localDataCopy = {};
 
-    // AKSI SIMPAN DATA (Bisa berupa TAMBAH BARU atau UPDATE DATA LAMA)
-    document.getElementById('menuForm').addEventListener('submit', function(e) {
+    // PROSES SIMPAN / UPDATE DATA
+    document.getElementById('menuForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         
         const id = document.getElementById('menuId').value;
         const name = document.getElementById('menuName').value;
         const price = document.getElementById('menuPrice').value;
+        const kategori = document.getElementById('menuKategori').value;
         const desc = document.getElementById('menuDesc').value;
-        let image = document.getElementById('menuImage').value;
+        const fileInput = document.getElementById('menuImageFile');
+        const oldImageUrl = document.getElementById('oldImageUrl').value;
+        
+        let finalImageUrl = oldImageUrl || 'toko.jpeg'; 
+        const btnSubmit = document.getElementById('btnSubmitForm');
 
-        if (!image) { image = 'toko.jpeg'; }
+        // Jika user memilih file baru untuk diupload
+        if (fileInput.files.length > 0) {
+            btnSubmit.disabled = true;
+            btnSubmit.innerText = "⏳ Sedang Mengupload Gambar...";
+            document.getElementById('uploadStatus').style.display = "block";
+
+            const file = fileInput.files[0];
+            const storageRef = storage.ref('foto_kue/' + Date.now() + '_' + file.name);
+            
+            try {
+                // Upload file ke Firebase Storage
+                const uploadTask = await storageRef.put(file);
+                // Ambil URL link gambar hasil upload tadi
+                finalImageUrl = await uploadTask.ref.getDownloadURL();
+                document.getElementById('uploadStatus').innerText = "✅ Upload foto sukses!";
+            } catch (error) {
+                alert("Gagal upload gambar: " + error.message);
+                btnSubmit.disabled = false;
+                btnSubmit.innerText = "🚀 Simpan & Tayangkan di Semua HP";
+                return;
+            }
+        }
 
         const dataKue = {
             name: name,
             price: parseInt(price),
+            kategori: kategori,
             desc: desc,
-            image: image
+            image: finalImageUrl
         };
 
         if (id) {
-            // MODE EDIT: Update data berdasarkan ID kue yang sudah ada
+            // MODE EDIT: Tinggal update tanpa menghapus data atau merombak gambar lama
             database.ref('katalog_menu/' + id).update(dataKue).then(() => {
-                alert('Kue berhasil diperbarui!');
+                alert('Data kue berhasil diperbarui secara live!');
                 resetToAddMode();
             });
         } else {
-            // MODE TAMBAH: Buat data baru menggunakan push
+            // MODE TAMBAH BARU
             database.ref('katalog_menu').push(dataKue).then(() => {
                 alert('Kue baru berhasil ditambahkan!');
-                document.getElementById('menuForm').reset();
+                resetToAddMode();
             });
         }
     });
 
-    // MENAMPILKAN DAFTAR KUE SECARA REALTIME DARI FIREBASE
+    // MENAMPILKAN DATA REALTIME DI DAFTAR BAWAH
     database.ref('katalog_menu').on('value', function(snapshot) {
         const listContainer = document.getElementById('liveMenuList');
         listContainer.innerHTML = '';
@@ -131,16 +172,20 @@
             return;
         }
 
-        localDataCopy = snapshot.val(); // Simpan salinan ke variabel lokal
+        localDataCopy = snapshot.val();
 
         snapshot.forEach((childSnapshot) => {
             const key = childSnapshot.key;
             const item = childSnapshot.val();
+            
+            let katBadge = `<span class="badge">Utama</span>`;
+            if(item.kategori === 'best_seller') { katBadge = `<span class="badge best">🔥 Best Seller</span>`; }
+            if(item.kategori === 'tambahan') { katBadge = `<span class="badge tambahan">Tambahan</span>`; }
 
             listContainer.innerHTML += `
                 <div class="menu-item">
                     <div>
-                        <strong>${item.name}</strong> - Rp ${parseInt(item.price).toLocaleString('id-ID')}
+                        <strong>${item.name}</strong> - Rp ${parseInt(item.price).toLocaleString('id-ID')} ${katBadge}
                     </div>
                     <div class="action-buttons">
                         <button class="btn-edit" onclick="pemicuEditKue('${key}')">✍️ Edit</button>
@@ -151,41 +196,42 @@
         });
     });
 
-    // FUNGSI MEMICU MODE EDIT (Mengisi Form dengan Data Lama)
+    // MEMICU MODE EDIT KUE (Mengisi form otomatis dari data lama)
     function pemicuEditKue(key) {
         const item = localDataCopy[key];
         
-        // Ubah Judul & Tombol Form ke Mode Edit
         document.getElementById('formTitle').innerText = "Edit Menu Kue: " + item.name;
-        document.getElementById('btnSubmitForm').innerText = "💾 Simpan Perubahan";
+        document.getElementById('btnSubmitForm').innerText = "💾 Simpan Perubahan (Update)";
         document.getElementById('btnCancelEdit').style.display = "block";
 
-        // Isi kolom form dengan data yang mau diedit
         document.getElementById('menuId').value = key;
         document.getElementById('menuName').value = item.name;
         document.getElementById('menuPrice').value = item.price;
+        document.getElementById('menuKategori').value = item.kategori || 'utama';
         document.getElementById('menuDesc').value = item.desc || '';
-        document.getElementById('menuImage').value = (item.image === 'toko.jpeg') ? '' : item.image;
+        document.getElementById('oldImageUrl').value = item.image; // Mengunci url foto lama
         
-        // Otomatis scroll ke atas biar admin langsung fokus ke form pengisian
+        document.getElementById('menuImageFile').value = ""; // Reset input file biar rapi
+        document.getElementById('uploadStatus').style.display = "none";
+
         window.scrollTo({top: 0, behavior: 'smooth'});
     }
 
-    // FUNGSI MENGEMBALIKAN FORM KE MODE TAMBAH BIASA
     function resetToAddMode() {
         document.getElementById('formTitle').innerText = "Tambah Menu Kue Baru (Cloud Database)";
         document.getElementById('btnSubmitForm').innerText = "🚀 Simpan & Tayangkan di Semua HP";
+        document.getElementById('btnSubmitForm').disabled = false;
         document.getElementById('btnCancelEdit').style.display = "none";
+        document.getElementById('uploadStatus').style.display = "none";
         
         document.getElementById('menuForm').reset();
-        document.getElementById('menuId').value = ""; // Kosongkan ID pembatas
+        document.getElementById('menuId').value = "";
+        document.getElementById('oldImageUrl').value = "";
     }
 
-    // FUNGSI HAPUS KUE DARI CLOUD DATABASE
     function hapusKue(key) {
-        if (confirm('Apakah Anda yakin ingin menghapus kue ini dari katalog publik?')) {
+        if (confirm('Apakah Anda yakin ingin menghapus kue ini?')) {
             database.ref('katalog_menu/' + key).remove().then(() => {
-                // Jika sedang mengedit kue yang dihapus, batalkan mode edit
                 if (document.getElementById('menuId').value === key) {
                     resetToAddMode();
                 }
