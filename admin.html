@@ -5,177 +5,193 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Admin - Mawar Sari</title>
     <style>
-        body { font-family: Arial, sans-serif; background-color: #f5f5f5; margin: 0; padding: 20px; }
-        .admin-container { max-width: 600px; margin: 30px auto; padding: 30px; background: #fff; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        .form-group { margin-bottom: 18px; }
-        .form-group label { display: block; margin-bottom: 8px; font-weight: bold; }
-        .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 16px; box-sizing: border-box; }
-        .checkbox-group { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
-        .checkbox-group input { width: auto; }
-        .btn-submit { background-color: #e67e22; color: white; border: none; padding: 12px 20px; font-size: 16px; cursor: pointer; border-radius: 5px; width: 100%; font-weight: bold; }
+        body { font-family: Arial, sans-serif; background-color: #f8f9fa; margin: 0; padding: 20px; }
+        .admin-container { max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; }
+        .form-group input, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+        .btn-submit { background-color: #e67e22; color: white; border: none; padding: 12px; width: 100%; font-size: 16px; font-weight: bold; border-radius: 5px; cursor: pointer; }
         .btn-submit:hover { background-color: #d35400; }
-        .menu-preview { margin-top: 30px; border-top: 2px dashed #ccc; padding-top: 20px; }
-        .preview-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; background: #f9f9f9; margin-bottom: 10px; border-radius: 5px; }
-        .btn-delete { background: #e74c3c; color: white; border: none; padding: 5px 10px; cursor: pointer; border-radius: 3px; }
-        .btn-logout { background-color: #95a5a6; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; float: right; margin-top: -45px; font-weight: bold; }
-        .btn-logout:hover { background-color: #7f8c8d; }
+        .btn-cancel { background-color: #7f8c8d; color: white; border: none; padding: 12px; width: 100%; font-size: 16px; font-weight: bold; border-radius: 5px; cursor: pointer; margin-top: 10px; display: none; }
+        .menu-list { margin-top: 30px; border-top: 2px solid #eee; padding-top: 20px; }
+        .menu-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; background: #fafafa; border: 1px solid #ddd; margin-bottom: 10px; border-radius: 5px; }
+        .action-buttons { display: flex; gap: 5px; }
+        .btn-edit { background-color: #3498db; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; }
+        .btn-edit:hover { background-color: #2980b9; }
+        .btn-delete { background-color: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; }
+        .btn-delete:hover { background-color: #c0392b; }
     </style>
+
+    <!-- LOAD SDK FIREBASE ONLINE -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 </head>
 <body>
 
-    <div class="admin-container">
-        <h2>⚙️ Dashboard Admin Mawar Sari</h2>
-        <button onclick="logoutAdmin()" class="btn-logout">Logout</button>
-        <p>Atur kue, produk best seller, dan harga promo secara otomatis!</p>
-        
-        <form id="menuForm">
-            <div class="form-group">
-                <label for="cakeName">Nama Kue / Roti:</label>
-                <input type="text" id="cakeName" required placeholder="Contoh: Roti Tawar Spesial">
-            </div>
-            
-            <div class="form-group">
-                <label for="cakePrice">Harga Asli (Rp):</label>
-                <input type="number" id="cakePrice" required placeholder="Contoh: 15000">
-            </div>
+<div class="admin-container">
+    <h2 id="formTitle">Tambah Menu Kue Baru (Cloud Database)</h2>
+    <form id="menuForm">
+        <!-- Input Tersembunyi Untuk Menyimpan ID Kue Saat Edit -->
+        <input type="hidden" id="menuId">
 
-            <!-- CHECKBOX UNTUK AKTIFKAN PROMO -->
-            <div class="form-group checkbox-group">
-                <input type="checkbox" id="isPromo" onchange="togglePromoField()">
-                <label style="margin: 0;" for="isPromo">Aktifkan Harga Promo / Diskon?</label>
-            </div>
-
-            <!-- INPUTAN HARGA SETELAH DISKON -->
-            <div class="form-group" id="promoPriceField" style="display: none;">
-                <label for="cakePromoPrice">Harga Setelah Diskon (Rp):</label>
-                <input type="number" id="cakePromoPrice" placeholder="Contoh: 12000">
-            </div>
-
-            <!-- FITUR REVISI BARU: CHECKBOX PILIHAN BEST SELLER -->
-            <div class="form-group checkbox-group" style="background-color: #fef5ec; padding: 10px; border-radius: 5px; border: 1px solid #f39c12;">
-                <input type="checkbox" id="isBestSeller">
-                <label style="margin: 0; color: #d35400;" for="isBestSeller">🔥 Tampilkan di Layar Utama (Sebagai Best Seller)</label>
-            </div>
-
-            <div class="form-group">
-                <label for="cakeDesc">Deskripsi Singkat:</label>
-                <textarea id="cakeDesc" rows="3" required placeholder="Contoh: Roti lembut dengan rasa coklat..."></textarea>
-            </div>
-            
-            <div class="form-group">
-                <label for="cakeImage">Pilih Foto Kue:</label>
-                <input type="file" id="cakeImage" accept="image/*" required>
-            </div>
-            
-            <button type="submit" class="btn-submit">Simpan & Tayangkan Menu</button>
-        </form>
-
-        <div class="menu-preview">
-            <h3>Daftar Menu Tambahan Saat Ini</h3>
-            <div id="adminMenuList"></div>
-            <p style="margin-top: 15px;"><a href="index.html" target="_blank">👉 Lihat Website Pembeli</a></p>
+        <div class="form-group">
+            <label>Nama Kue:</label>
+            <input type="text" id="menuName" required placeholder="Contoh: Black Forest Premium">
         </div>
+        <div class="form-group">
+            <label>Harga (Rp):</label>
+            <input type="number" id="menuPrice" required placeholder="Contoh: 100000">
+        </div>
+        <div class="form-group">
+            <label>Deskripsi Kue:</label>
+            <textarea id="menuDesc" rows="3" placeholder="Sebutkan varian rasa, ukuran, atau detail kue..."></textarea>
+        </div>
+        <div class="form-group">
+            <label>URL Foto Kue (Link Gambar):</label>
+            <input type="text" id="menuImage" placeholder="Tempel link foto kue atau kosongkan untuk default">
+        </div>
+        <button type="submit" id="btnSubmitForm" class="btn-submit">🚀 Simpan & Tayangkan di Semua HP</button>
+        <button type="button" id="btnCancelEdit" class="btn-cancel" onclick="resetToAddMode()">❌ Batal Edit</button>
+    </form>
+
+    <div class="menu-list">
+        <h3>Daftar Menu Tambahan Saat Ini (Live dari Cloud):</h3>
+        <div id="liveMenuList">Memuat data kue...</div>
     </div>
+</div>
 
-    <script>
-        // PROTEKSI KEAMANAN HALAMAN ADMIN
-        if (sessionStorage.getItem('isAdminLoggedIn') !== 'true') {
-            alert('Akses ditolak! Silakan login terlebih dahulu.');
-            window.location.href = 'login.html';
-        }
+<script>
+    // ==========================================
+    // SILAKAN MASUKKAN CONFIG FIREBASE KAMU DI SINI
+    // ==========================================
+    const firebaseConfig = {
+        apiKey: "AIzaSy...",
+        authDomain: "mawar-sari-bakery.firebaseapp.com",
+        databaseURL: "https://mawar-sari-bakery-default-rtdb.firebaseio.com",
+        projectId: "mawar-sari-bakery",
+        storageBucket: "mawar-sari-bakery.appspot.com",
+        messagingSenderId: "...",
+        appId: "..."
+    };
+    
+    // Inisialisasi Firebase
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
 
-        function logoutAdmin() {
-            sessionStorage.removeItem('isAdminLoggedIn');
-            window.location.href = 'login.html';
-        }
+    // Proteksi Halaman Login Sederhana
+    if (sessionStorage.getItem('isAdminLoggedIn') !== 'true') {
+        alert('Silakan login terlebih dahulu!');
+        window.location.href = 'login.html';
+    }
 
-        function togglePromoField() {
-            const isPromo = document.getElementById('isPromo').checked;
-            document.getElementById('promoPriceField').style.display = isPromo ? 'block' : 'none';
-        }
+    // Variabel lokal untuk menyimpan salinan data dari Firebase agar mudah diambil saat edit
+    let localDataCopy = {};
 
-        const menuForm = document.getElementById('menuForm');
-        const adminMenuList = document.getElementById('adminMenuList');
+    // AKSI SIMPAN DATA (Bisa berupa TAMBAH BARU atau UPDATE DATA LAMA)
+    document.getElementById('menuForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const id = document.getElementById('menuId').value;
+        const name = document.getElementById('menuName').value;
+        const price = document.getElementById('menuPrice').value;
+        const desc = document.getElementById('menuDesc').value;
+        let image = document.getElementById('menuImage').value;
 
-        function displayAdminMenu() {
-            adminMenuList.innerHTML = '';
-            let currentMenu = JSON.parse(localStorage.getItem('umkm_menu')) || [];
-            
-            if(currentMenu.length === 0) {
-                adminMenuList.innerHTML = '<p style="color: #888;">Belum ada menu tambahan.</p>';
-                return;
-            }
+        if (!image) { image = 'toko.jpeg'; }
 
-            currentMenu.forEach((item, index) => {
-                let labelStatus = item.isBestSeller ? ' <span style="color:#e67e22;">[🔥 Best Seller]</span>' : '';
-                adminMenuList.innerHTML += `
-                    <div class="preview-item">
-                        <div>
-                            <strong>${item.name}</strong> - Rp ${parseInt(item.price).toLocaleString('id-ID')}${labelStatus}
-                        </div>
-                        <button class="btn-delete" onclick="deleteMenu(${index})">Hapus</button>
-                    </div>
-                `;
+        const dataKue = {
+            name: name,
+            price: parseInt(price),
+            desc: desc,
+            image: image
+        };
+
+        if (id) {
+            // MODE EDIT: Update data berdasarkan ID kue yang sudah ada
+            database.ref('katalog_menu/' + id).update(dataKue).then(() => {
+                alert('Kue berhasil diperbarui!');
+                resetToAddMode();
+            });
+        } else {
+            // MODE TAMBAH: Buat data baru menggunakan push
+            database.ref('katalog_menu').push(dataKue).then(() => {
+                alert('Kue baru berhasil ditambahkan!');
+                document.getElementById('menuForm').reset();
             });
         }
+    });
 
-        menuForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const name = document.getElementById('cakeName').value;
-            const price = document.getElementById('cakePrice').value;
-            const isPromo = document.getElementById('isPromo').checked;
-            const promoPrice = document.getElementById('cakePromoPrice').value;
-            const isBestSeller = document.getElementById('isBestSeller').checked;
-            const desc = document.getElementById('cakeDesc').value;
-            const imageFile = document.getElementById('cakeImage').files[0];
-
-            if (imageFile) {
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    const img = new Image();
-                    img.src = event.target.result;
-                    img.onload = function() {
-                        // KOMPRESI GAMBAR otomatis biar local storage gak crash/penuh
-                        const canvas = document.createElement('canvas');
-                        const MAX_WIDTH = 500;
-                        const scaleSize = MAX_WIDTH / img.width;
-                        canvas.width = MAX_WIDTH;
-                        canvas.height = img.height * scaleSize;
-
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-                        const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
-
-                        const newCake = {
-                            name, price, isPromo, promoPrice, isBestSeller, desc, image: compressedBase64
-                        };
-
-                        let currentMenu = JSON.parse(localStorage.getItem('umkm_menu')) || [];
-                        currentMenu.push(newCake);
-                        localStorage.setItem('umkm_menu', JSON.stringify(currentMenu));
-
-                        menuForm.reset();
-                        togglePromoField();
-                        displayAdminMenu();
-                        alert('Hore! Menu baru berhasil dimasukkan dan disinkronkan!');
-                    };
-                };
-                reader.readAsDataURL(imageFile);
-            }
-        });
-
-        function deleteMenu(index) {
-            if(confirm('Apakah Anda yakin ingin menghapus menu ini?')) {
-                let currentMenu = JSON.parse(localStorage.getItem('umkm_menu')) || [];
-                currentMenu.splice(index, 1);
-                localStorage.setItem('umkm_menu', JSON.stringify(currentMenu));
-                displayAdminMenu();
-            }
+    // MENAMPILKAN DAFTAR KUE SECARA REALTIME DARI FIREBASE
+    database.ref('katalog_menu').on('value', function(snapshot) {
+        const listContainer = document.getElementById('liveMenuList');
+        listContainer.innerHTML = '';
+        
+        if (!snapshot.exists()) {
+            listContainer.innerHTML = '<p>Belum ada menu kue yang tersimpan.</p>';
+            return;
         }
 
-        displayAdminMenu();
-    </script>
+        localDataCopy = snapshot.val(); // Simpan salinan ke variabel lokal
+
+        snapshot.forEach((childSnapshot) => {
+            const key = childSnapshot.key;
+            const item = childSnapshot.val();
+
+            listContainer.innerHTML += `
+                <div class="menu-item">
+                    <div>
+                        <strong>${item.name}</strong> - Rp ${parseInt(item.price).toLocaleString('id-ID')}
+                    </div>
+                    <div class="action-buttons">
+                        <button class="btn-edit" onclick="pemicuEditKue('${key}')">✍️ Edit</button>
+                        <button class="btn-delete" onclick="hapusKue('${key}')">🗑️ Hapus</button>
+                    </div>
+                </div>
+            `;
+        });
+    });
+
+    // FUNGSI MEMICU MODE EDIT (Mengisi Form dengan Data Lama)
+    function pemicuEditKue(key) {
+        const item = localDataCopy[key];
+        
+        // Ubah Judul & Tombol Form ke Mode Edit
+        document.getElementById('formTitle').innerText = "Edit Menu Kue: " + item.name;
+        document.getElementById('btnSubmitForm').innerText = "💾 Simpan Perubahan";
+        document.getElementById('btnCancelEdit').style.display = "block";
+
+        // Isi kolom form dengan data yang mau diedit
+        document.getElementById('menuId').value = key;
+        document.getElementById('menuName').value = item.name;
+        document.getElementById('menuPrice').value = item.price;
+        document.getElementById('menuDesc').value = item.desc || '';
+        document.getElementById('menuImage').value = (item.image === 'toko.jpeg') ? '' : item.image;
+        
+        // Otomatis scroll ke atas biar admin langsung fokus ke form pengisian
+        window.scrollTo({top: 0, behavior: 'smooth'});
+    }
+
+    // FUNGSI MENGEMBALIKAN FORM KE MODE TAMBAH BIASA
+    function resetToAddMode() {
+        document.getElementById('formTitle').innerText = "Tambah Menu Kue Baru (Cloud Database)";
+        document.getElementById('btnSubmitForm').innerText = "🚀 Simpan & Tayangkan di Semua HP";
+        document.getElementById('btnCancelEdit').style.display = "none";
+        
+        document.getElementById('menuForm').reset();
+        document.getElementById('menuId').value = ""; // Kosongkan ID pembatas
+    }
+
+    // FUNGSI HAPUS KUE DARI CLOUD DATABASE
+    function hapusKue(key) {
+        if (confirm('Apakah Anda yakin ingin menghapus kue ini dari katalog publik?')) {
+            database.ref('katalog_menu/' + key).remove().then(() => {
+                // Jika sedang mengedit kue yang dihapus, batalkan mode edit
+                if (document.getElementById('menuId').value === key) {
+                    resetToAddMode();
+                }
+            });
+        }
+    }
+</script>
 </body>
 </html>

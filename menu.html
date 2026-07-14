@@ -4,103 +4,108 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Semua Menu - Mawar Sari Bakery</title>
-    <link rel="stylesheet" href="style.css">
     <style>
+        body { font-family: Arial, sans-serif; background-color: #fafafa; margin: 0; padding: 0; }
+        .navbar { background: #e67e22; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-weight: bold; font-size: 20px; }
+        .nav-links a { color: white; text-decoration: none; font-weight: bold; }
         .menu-container { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
-        .menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1-fr)); gap: 25px; margin-top: 30px; }
-        .card-menu { background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border: 1px solid #eee; transition: transform 0.2s; display: flex; flex-direction: column; justify-content: space-between; }
-        .card-menu:hover { transform: translateY(-5px); }
+        .menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; margin-top: 30px; }
+        .card-menu { background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border: 1px solid #eee; display: flex; flex-direction: column; justify-content: space-between; }
         .card-img { width: 100%; height: 200px; object-fit: cover; }
         .card-body { padding: 15px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
         .card-title { font-size: 18px; margin: 0 0 10px 0; color: #2c3e50; }
         .card-desc { font-size: 14px; color: #7f8c8d; margin-bottom: 15px; line-height: 1.4; }
         .price-tag { font-size: 16px; font-weight: bold; color: #e67e22; margin-bottom: 15px; }
-        .btn-buy { background: #e67e22; color: white; text-align: center; padding: 10px; border: none; border-radius: 5px; cursor: pointer; text-decoration: none; font-weight: bold; display: block; }
+        .btn-buy { background: #e67e22; color: white; text-align: center; padding: 10px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; width: 100%; }
         .btn-buy:hover { background: #d35400; }
-        .badge-promo { background: #e74c3c; color: white; padding: 3px 8px; border-radius: 3px; font-size: 11px; font-weight: bold; margin-left: 10px; }
     </style>
+
+    <!-- LOAD SDK FIREBASE ONLINE -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 </head>
-<body style="background-color: #fafafa;">
+<body>
 
     <div class="navbar">
         <div class="logo">Mawar Sari Bakery & Cake</div>
-        <ul class="nav-links">
-            <li><a href="index.html">⬅️ Kembali ke Home</a></li>
-        </ul>
+        <div class="nav-links"><a href="index.html">⬅️ Kembali ke Home</a></div>
     </div>
 
     <div class="menu-container">
-        <h2 style="text-align: center; color: #2c3e50; margin-top: 20px;">Katalog Kue Terlengkap Kami</h2>
-        <p style="text-align: center; color: #7f8c8d;">Pilihlah cita rasa premium favorit Anda dan pesan secara instan.</p>
+        <h2 style="text-align: center; color: #2c3e50;">Katalog Kue Terlengkap Kami</h2>
+        <p style="text-align: center; color: #7f8c8d;">Live terhubung ke Cloud. Pilihlah cita rasa premium favorit Anda.</p>
         
         <div class="menu-grid" id="fullMenuGrid">
-            <!-- Konten menu di-load otomatis dari localStorage -->
+            <p style="text-align: center; grid-column: 1/-1;">Menghubungkan ke database kue...</p>
         </div>
     </div>
 
     <script>
-        function loadFullMenu() {
-            const menuGrid = document.getElementById('fullMenuGrid');
-            const customMenu = JSON.parse(localStorage.getItem('umkm_menu')) || [];
+        // MASUKKAN KONFIGURASI FIREBASE ANDA DI SINI (Harus sama seperti di file admin)
+        const firebaseConfig = {
+            apiKey: "AIzaSy...",
+            authDomain: "mawar-sari-bakery.firebaseapp.com",
+            databaseURL: "https://mawar-sari-bakery-default-rtdb.firebaseio.com",
+            projectId: "mawar-sari-bakery",
+            storageBucket: "mawar-sari-bakery.appspot.com",
+            messagingSenderId: "...",
+            appId: "..."
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
 
-            if (customMenu.length === 0) {
-                menuGrid.innerHTML = '<p style="text-align: center; grid-column: 1/-1; color: #888;">Belum ada menu yang didaftarkan oleh admin.</p>';
+        // Object penampung sementara data live dari Firebase
+        let dataKueFirebase = {};
+
+        // Ambil data kue secara otomatis dan realtime dari Cloud Database
+        database.ref('katalog_menu').on('value', function(snapshot) {
+            const menuGrid = document.getElementById('fullMenuGrid');
+            menuGrid.innerHTML = '';
+            
+            if (!snapshot.exists()) {
+                menuGrid.innerHTML = '<p style="text-align: center; grid-column: 1/-1; color: #888;">Belum ada menu kue yang tersedia saat ini.</p>';
                 return;
             }
 
-            menuGrid.innerHTML = '';
-            customMenu.forEach((item, index) => {
-                let hargaKonten = `Rp ${parseInt(item.price).toLocaleString('id-ID')}`;
-                let realPrice = item.price;
-                
-                if (item.isPromo && item.promoPrice) {
-                    realPrice = item.promoPrice;
-                    hargaKonten = `
-                        <span style="color: #e74c3c; font-weight: bold;">Rp ${parseInt(item.promoPrice).toLocaleString('id-ID')}</span>
-                        <span style="text-decoration: line-through; color: #888; font-size: 13px; margin-left: 10px;">Rp ${parseInt(item.price).toLocaleString('id-ID')}</span>
-                        <span class="badge-promo">PROMO</span>
-                    `;
-                }
+            dataKueFirebase = snapshot.val(); // simpan objek utuh untuk fungsi beli
+
+            snapshot.forEach((childSnapshot) => {
+                const key = childSnapshot.key;
+                const item = childSnapshot.val();
 
                 menuGrid.innerHTML += `
                     <div class="card-menu">
-                        <img src="${item.image || 'toko.jpeg'}" alt="${item.name}" class="card-img">
+                        <img src="${item.image}" alt="${item.name}" class="card-img">
                         <div class="card-body">
                             <div>
                                 <h3 class="card-title">${item.name}</h3>
-                                <p class="card-desc">${item.desc || 'Deskripsi kue spesial Mawar Sari.'}</p>
+                                <p class="card-desc">${item.desc || 'Kue kelezatan premium buatan Mawar Sari Bakery.'}</p>
                             </div>
                             <div>
-                                <div class="price-tag">${hargaKonten}</div>
-                                <button class="btn-buy" onclick="beliSekarang(${index})">Pesan Sekarang</button>
+                                <div class="price-tag">Rp ${parseInt(item.price).toLocaleString('id-ID')}</div>
+                                <button class="btn-buy" onclick="beliSekarang('${key}')">Pesan Sekarang</button>
                             </div>
                         </div>
                     </div>
                 `;
             });
-        }
+        });
 
-        function beliSekarang(index) {
-            const customMenu = JSON.parse(localStorage.getItem('umkm_menu')) || [];
-            const item = customMenu[index];
-            let finalPrice = item.price;
-
-            if (item.isPromo && item.promoPrice) {
-                finalPrice = item.promoPrice;
-            }
-
+        function beliSekarang(key) {
+            const itemSelected = dataKueFirebase[key];
+            
             const dataCheckout = {
-                name: item.name,
-                price: finalPrice,
-                image: item.image || 'toko.jpeg'
+                name: itemSelected.name,
+                price: itemSelected.price,
+                image: itemSelected.image
             };
 
+            // Menyimpan sementara item terpilih ke checkout page
             localStorage.setItem('produk_checkout', JSON.stringify(dataCheckout));
             window.location.href = 'checkout.html';
         }
-
-        // Jalankan fungsi saat halaman dibuka
-        window.onload = loadFullMenu;
     </script>
 </body>
 </html>

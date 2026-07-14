@@ -113,8 +113,17 @@
         calculateTotal();
     }
 
+    // FUNGSI UTAMA HITUNG TOTAL DENGAN VALIDASI INPUT MINUS/KOSONG
     function calculateTotal() {
-        const qty = parseInt(document.getElementById('buyerQty').value) || 1;
+        let qtyInput = document.getElementById('buyerQty');
+        let qty = parseInt(qtyInput.value);
+        
+        // VALIDASI: Jika input kosong, minus, atau nol, paksa balik ke 1
+        if (isNaN(qty) || qty < 1) {
+            qty = 1;
+            qtyInput.value = 1;
+        }
+        
         const delivery = document.getElementById('deliveryMethod').value;
         const shippingCost = (delivery === "Kurir Toko") ? 10000 : 0;
         
@@ -133,11 +142,22 @@
         const phone = document.getElementById('buyerPhone').value;
         const qty = document.getElementById('buyerQty').value;
         const delivery = document.getElementById('deliveryMethod').value;
-        const address = document.getElementById('buyerAddress').value || 'Ambil di toko';
-        const mapsUrl = document.getElementById('buyerMaps').value || 'Tidak melampirkan link peta';
         const totalBayar = calculateTotal();
 
-        // Format pesan WhatsApp agar rapi beserta informasi Maps
+        let address = "";
+        let mapsUrl = "";
+
+        // LOGIKA PENENTUAN ALAMAT YANG BENAR
+        if (delivery === "Ambil Sendiri") {
+            // Gantilah teks di bawah ini dengan alamat dan link maps real toko Mawar Sari klien Anda
+            address = "Toko Mawar Sari Bakery, Jl. Raya Utama No.45 (Depan Alun-Alun)";
+            mapsUrl = "https://maps.google.com/?q=Mawar+Sari+Bakery"; 
+        } else {
+            address = document.getElementById('buyerAddress').value;
+            mapsUrl = document.getElementById('buyerMaps').value || 'Tidak melampirkan link peta rumah';
+        }
+
+        // Format pesan WhatsApp yang dikirim
         const waText = `*PESANAN BARU - MAWAR SARI BAKERY*\n\n` +
                        `*Produk:* ${product.name}\n` +
                        `*Harga Satuan:* Rp ${parseInt(product.price).toLocaleString('id-ID')}\n` +
@@ -146,8 +166,8 @@
                        `*Nama Pembeli:* ${name}\n` +
                        `*No. HP:* ${phone}\n` +
                        `*Metode:* ${delivery}\n` +
-                       `*Alamat:* ${address}\n` +
-                       `*Link Maps:* ${mapsUrl}\n` +
+                       `*Alamat Lokasi:* ${address}\n` +
+                       `*Link Peta:* ${mapsUrl}\n` +
                        `----------------------------------\n` +
                        `*TOTAL BAYAR:* *Rp ${totalBayar.toLocaleString('id-ID')}*`;
 
