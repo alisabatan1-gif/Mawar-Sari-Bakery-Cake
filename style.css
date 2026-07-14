@@ -29,7 +29,6 @@ body {
     top: 0;
     box-shadow: none;
     z-index: 1000;
-    /* Perbaikan: Menghilangkan tanda kutip agar efek transisi transparan ke putih berjalan mulus */
     transition: background-color 0.35s ease, box-shadow 0.35s ease, padding 0.35s ease;
 }
 
@@ -76,7 +75,7 @@ body {
     backdrop-filter: blur(12px); 
     -webkit-backdrop-filter: blur(12px);
     box-shadow: 0 4px 20px rgba(139, 115, 85, 0.12);
-    padding: 12px 5%; /* Menyesuaikan padding agar terlihat kokoh dan simetris */
+    padding: 12px 5%; 
 }
 
 /* Mengubah warna Logo menjadi Cokelat Tua agar kontras dengan warna putih vanilla */
@@ -475,9 +474,9 @@ body {
     transform: translateY(-3px);
 }
 
-/* =========================
-   RESPONSIVE HP
-========================= */
+/* ============================================= */
+/* ===== RESPONSIVE HP & PERBAIKAN TOTAL ======== */
+/* ============================================= */
 @media screen and (max-width: 768px) {
     .navbar {
         flex-direction: column;
@@ -571,10 +570,10 @@ body {
     cursor: pointer;
 }
 
-@media (max-width:768px){
+@media (max-width: 768px) {
     .navbar {
         display: flex;
-        flex-direction: row; /* Menjaga logo & hamburger sejajar di mobile */
+        flex-direction: row; 
         justify-content: space-between;
         align-items: center;
         padding: 15px 20px;
@@ -593,10 +592,10 @@ body {
         display: none;
         flex-direction: column;
         position: absolute;
-        top: 70px;
+        top: 60px;
         left: 0;
         width: 100%;
-        background: #1a1a1a;
+        background: #1a1a1a; /* Background awal lipatan menu di paling atas */
         padding: 20px 0;
     }
 
@@ -608,11 +607,23 @@ body {
         margin: 15px 0;
         text-align: center;
     }
+
+    /* ─── PERBAIKAN FIX UNTUK HP SAAT DI-SCROLL ─── */
     
-    /* Perbaikan: Agar menu responsif HP juga ikut berubah warna gelap di background putih */
+    /* 1. Mengubah background boks menu lipat HP dari gelap menjadi vanilla terang */
     .navbar.scrolled .nav-links {
-        background: #fdf8f2;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        background: #fdf8f2 !important; 
+        box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1) !important;
+    }
+
+    /* 2. Mengubah teks menu lipat HP menjadi cokelat tua agar sangat kontras & terbaca */
+    .navbar.scrolled .nav-links a {
+        color: #2c1d11 !important;
+    }
+
+    /* 3. Menambahkan warna hover menu saat kondisi scrolled di HP */
+    .navbar.scrolled .nav-links a:hover {
+        color: #d35400 !important;
     }
 
     .hero-section {
