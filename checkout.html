@@ -102,13 +102,16 @@
         const delivery = document.getElementById('deliveryMethod').value;
         const addressSection = document.getElementById('deliveryAddressSection');
         const addressInput = document.getElementById('buyerAddress');
+        const mapsInput = document.getElementById('buyerMaps');
         
         if (delivery === "Kurir Toko") {
             addressSection.style.display = "block";
             addressInput.setAttribute('required', 'required');
+            mapsInput.setAttribute('required', 'required'); // SEKARANG WAJIB DIISI JIKA DIKIRIM KURIR
         } else {
             addressSection.style.display = "none";
             addressInput.removeAttribute('required');
+            mapsInput.removeAttribute('required');
         }
         calculateTotal();
     }
@@ -118,7 +121,6 @@
         let qtyInput = document.getElementById('buyerQty');
         let qty = parseInt(qtyInput.value);
         
-        // VALIDASI: Jika input kosong, minus, atau nol, paksa balik ke 1
         if (isNaN(qty) || qty < 1) {
             qty = 1;
             qtyInput.value = 1;
@@ -147,14 +149,12 @@
         let address = "";
         let mapsUrl = "";
 
-        // LOGIKA PENENTUAN ALAMAT YANG BENAR
         if (delivery === "Ambil Sendiri") {
-            // Gantilah teks di bawah ini dengan alamat dan link maps real toko Mawar Sari klien Anda
             address = "Toko Mawar Sari Bakery, Jl. Raya Utama No.45 (Depan Alun-Alun)";
             mapsUrl = "https://maps.google.com/?q=Mawar+Sari+Bakery"; 
         } else {
             address = document.getElementById('buyerAddress').value;
-            mapsUrl = document.getElementById('buyerMaps').value || 'Tidak melampirkan link peta rumah';
+            mapsUrl = document.getElementById('buyerMaps').value;
         }
 
         // Format pesan WhatsApp yang dikirim

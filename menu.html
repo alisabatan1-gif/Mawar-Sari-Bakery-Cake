@@ -3,109 +3,105 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Semua Menu - Mawar Sari Bakery</title>
+    <title>Katalog Menu Lengkap - Mawar Sari</title>
     <style>
-        body { font-family: Arial, sans-serif; background-color: #fafafa; margin: 0; padding: 0; }
-        .navbar { background: #e67e22; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
-        .logo { font-weight: bold; font-size: 20px; }
-        .nav-links a { color: white; text-decoration: none; font-weight: bold; }
-        .menu-container { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
-        .menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; margin-top: 30px; }
-        .card-menu { background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border: 1px solid #eee; display: flex; flex-direction: column; justify-content: space-between; }
-        .card-img { width: 100%; height: 200px; object-fit: cover; }
-        .card-body { padding: 15px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
-        .card-title { font-size: 18px; margin: 0 0 10px 0; color: #2c3e50; }
-        .card-desc { font-size: 14px; color: #7f8c8d; margin-bottom: 15px; line-height: 1.4; }
-        .price-tag { font-size: 16px; font-weight: bold; color: #e67e22; margin-bottom: 15px; }
-        .btn-buy { background: #e67e22; color: white; text-align: center; padding: 10px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; width: 100%; }
-        .btn-buy:hover { background: #d35400; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #fcf8f5; margin: 0; padding: 20px; }
+        .container { max-width: 1100px; margin: 0 auto; }
+        .header-area { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #e74c3c; padding-bottom: 15px; margin-bottom: 30px; }
+        .header-area h1 { margin: 0; color: #c0392b; }
+        .btn-home { background: #e67e22; color: white; padding: 10px 20px; text-decoration: none; border-radius: 20px; font-weight: bold; font-size: 14px; }
+        .menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; }
+        .card { background: white; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); overflow: hidden; border: 1px solid #f1f2f6; display: flex; flex-direction: column; transition: 0.3s; }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 6px 15px rgba(0,0,0,0.1); }
+        .card img { width: 100%; height: 200px; object-fit: cover; }
+        .card-body { padding: 15px; flex-grow: 1; display: flex; flex-direction: column; }
+        .card-body h3 { margin: 0 0 10px 0; font-size: 18px; color: #2c3e50; }
+        .price { font-size: 16px; font-weight: bold; color: #e67e22; margin-bottom: 10px; }
+        .desc { font-size: 13px; color: #7f8c8d; line-height: 1.4; margin-bottom: 15px; flex-grow: 1; }
+        .btn-buy { background-color: #2ecc71; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; font-weight: bold; text-align: center; width: 100%; transition: 0.2s; }
+        .btn-buy:hover { background-color: #27ae60; }
+        .badge-kategori { background: #3498db; color: white; padding: 3px 8px; border-radius: 20px; font-size: 11px; display: inline-block; width: max-content; margin-bottom: 8px; }
     </style>
 
-    <!-- LOAD SDK FIREBASE ONLINE -->
+    <!-- SDK FIREBASE REAL-TIME -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 </head>
 <body>
 
-    <div class="navbar">
-        <div class="logo">Mawar Sari Bakery & Cake</div>
-        <div class="nav-links"><a href="index.html">⬅️ Kembali ke Home</a></div>
+<div class="container">
+    <div class="header-area">
+        <h1>Katalog Kue & Roti Segar</h1>
+        <a href="index.html" class="btn-home">🏠 Ke Halaman Utama</a>
     </div>
 
-    <div class="menu-container">
-        <h2 style="text-align: center; color: #2c3e50;">Katalog Kue Terlengkap Kami</h2>
-        <p style="text-align: center; color: #7f8c8d;">Live terhubung ke Cloud. Pilihlah cita rasa premium favorit Anda.</p>
+    <!-- Tampilan Grid List Menu -->
+    <div class="menu-grid" id="menuGridBox">
+        <p style="color: #888; text-align: center; grid-column: 1/-1;">Menghubungkan ke Etalase Mawar Sari Cloud...</p>
+    </div>
+</div>
+
+<script>
+    // KONFIGURASI FIREBASE KONSISTEN
+    const firebaseConfig = {
+        apiKey: "AIzaSyBV6z7KT4OM8QiopYoFbRUGI6248HEkE8w",
+        authDomain: "mawar-sari-bakery.firebaseapp.com",
+        databaseURL: "https://mawar-sari-bakery-default-rtdb.firebaseio.com",
+        projectId: "mawar-sari-bakery",
+        storageBucket: "mawar-sari-bakery.firebasestorage.app",
+        messagingSenderId: "100804150468",
+        appId: "1:100804150468:web:fdb97e55881183f69d7591"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
+    const menuGridBox = document.getElementById('menuGridBox');
+
+    // AKTIFKAN EVENT LISTENER LIVE CLOUD (.on)
+    database.ref('katalog_menu').on('value', function(snapshot) {
+        menuGridBox.innerHTML = "";
         
-        <div class="menu-grid" id="fullMenuGrid">
-            <p style="text-align: center; grid-column: 1/-1;">Menghubungkan ke database kue...</p>
-        </div>
-    </div>
+        if (!snapshot.exists()) {
+            menuGridBox.innerHTML = `<p style="color:#888; text-align: center; grid-column: 1/-1;">Etalase toko masih kosong.</p>`;
+            return;
+        }
 
-    <script>
-        // CONFIG FIREBASE MILIK ALI SABATAN
-        const firebaseConfig = {
-            apiKey: "AIzaSyBV6z7KT4OM8QiopYoFbRUGI6248HEkE8w",
-            authDomain: "mawar-sari-bakery.firebaseapp.com",
-            databaseURL: "https://mawar-sari-bakery-default-rtdb.firebaseio.com",
-            projectId: "mawar-sari-bakery",
-            storageBucket: "mawar-sari-bakery.firebasestorage.app",
-            messagingSenderId: "100804150468",
-            appId: "1:100804150468:web:fdb97e55881183f69d7591"
+        snapshot.forEach((childSnapshot) => {
+            const item = childSnapshot.val();
+            
+            const card = document.createElement('div');
+            card.className = 'card';
+            
+            const teksKategori = item.kategori === 'best_seller' ? 'Best Seller ⭐' : 'Pilihan Premium';
+            
+            card.innerHTML = `
+                <img src="${item.image || 'toko.jpeg'}" alt="${item.name}">
+                <div class="card-body">
+                    <span class="badge-kategori" style="${item.kategori === 'best_seller' ? 'background:#e74c3c;' : ''}">${teksKategori}</span>
+                    <h3>${item.name}</h3>
+                    <div class="price">Rp ${parseInt(item.price).toLocaleString('id-ID')}</div>
+                    <div class="desc">${item.desc || 'Deskripsi varian belum ditambahkan oleh toko.'}</div>
+                    <button class="btn-buy" onclick="alihkanKeCheckout('${encodeURIComponent(JSON.stringify(item))}')">🛒 Beli Langsung</button>
+                </div>
+            `;
+            
+            menuGridBox.appendChild(card);
+        });
+    });
+
+    function alihkanKeCheckout(encodedData) {
+        const itemObj = JSON.parse(decodeURIComponent(encodedData));
+        
+        const dataCheckout = {
+            name: itemObj.name,
+            price: itemObj.price,
+            image: itemObj.image || 'toko.jpeg'
         };
         
-        firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
-
-        // Object penampung sementara data live dari Firebase
-        let dataKueFirebase = {};
-
-        // Ambil data kue secara otomatis dan realtime dari Cloud Database
-        database.ref('katalog_menu').on('value', function(snapshot) {
-            const menuGrid = document.getElementById('fullMenuGrid');
-            menuGrid.innerHTML = '';
-            
-            if (!snapshot.exists()) {
-                menuGrid.innerHTML = '<p style="text-align: center; grid-column: 1/-1; color: #888;">Belum ada menu kue yang tersedia saat ini.</p>';
-                return;
-            }
-
-            dataKueFirebase = snapshot.val(); // simpan objek utuh untuk fungsi beli
-
-            snapshot.forEach((childSnapshot) => {
-                const key = childSnapshot.key;
-                const item = childSnapshot.val();
-
-                menuGrid.innerHTML += `
-                    <div class="card-menu">
-                        <img src="${item.image}" alt="${item.name}" class="card-img">
-                        <div class="card-body">
-                            <div>
-                                <h3 class="card-title">${item.name}</h3>
-                                <p class="card-desc">${item.desc || 'Kue kelezatan premium buatan Mawar Sari Bakery.'}</p>
-                            </div>
-                            <div>
-                                <div class="price-tag">Rp ${parseInt(item.price).toLocaleString('id-ID')}</div>
-                                <button class="btn-buy" onclick="beliSekarang('${key}')">Pesan Sekarang</button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            });
-        });
-
-        function beliSekarang(key) {
-            const itemSelected = dataKueFirebase[key];
-            
-            const dataCheckout = {
-                name: itemSelected.name,
-                price: itemSelected.price,
-                image: itemSelected.image
-            };
-
-            // Menyimpan sementara item terpilih ke checkout page
-            localStorage.setItem('produk_checkout', JSON.stringify(dataCheckout));
-            window.location.href = 'checkout.html';
-        }
-    </script>
+        localStorage.setItem('produk_checkout', JSON.stringify(dataCheckout));
+        window.location.href = 'checkout.html';
+    }
+</script>
 </body>
 </html>
