@@ -17,12 +17,15 @@
         .menu-preview { margin-top: 30px; border-top: 2px dashed #ccc; padding-top: 20px; }
         .preview-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; background: #f9f9f9; margin-bottom: 10px; border-radius: 5px; }
         .btn-delete { background: #e74c3c; color: white; border: none; padding: 5px 10px; cursor: pointer; border-radius: 3px; }
+        .btn-logout { background-color: #95a5a6; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; float: right; margin-top: -45px; font-weight: bold; }
+        .btn-logout:hover { background-color: #7f8c8d; }
     </style>
 </head>
 <body>
 
     <div class="admin-container">
-        <h2>🍞 Dashboard Admin Mawar Sari</h2>
+        <h2>⚙️ Dashboard Admin Mawar Sari</h2>
+        <button onclick="logoutAdmin()" class="btn-logout">Logout</button>
         <p>Atur kue, produk best seller, dan harga promo secara otomatis!</p>
         
         <form id="menuForm">
@@ -51,7 +54,7 @@
             <!-- FITUR REVISI BARU: CHECKBOX PILIHAN BEST SELLER -->
             <div class="form-group checkbox-group" style="background-color: #fef5ec; padding: 10px; border-radius: 5px; border: 1px solid #f39c12;">
                 <input type="checkbox" id="isBestSeller">
-                <label style="margin: 0; color: #d35400;" for="isBestSeller">🌟 Tampilkan di Layar Utama (Sebagai Best Seller)</label>
+                <label style="margin: 0; color: #d35400;" for="isBestSeller">🔥 Tampilkan di Layar Utama (Sebagai Best Seller)</label>
             </div>
 
             <div class="form-group">
@@ -75,6 +78,17 @@
     </div>
 
     <script>
+        // PROTEKSI KEAMANAN HALAMAN ADMIN
+        if (sessionStorage.getItem('isAdminLoggedIn') !== 'true') {
+            alert('Akses ditolak! Silakan login terlebih dahulu.');
+            window.location.href = 'login.html';
+        }
+
+        function logoutAdmin() {
+            sessionStorage.removeItem('isAdminLoggedIn');
+            window.location.href = 'login.html';
+        }
+
         function togglePromoField() {
             const isPromo = document.getElementById('isPromo').checked;
             document.getElementById('promoPriceField').style.display = isPromo ? 'block' : 'none';
@@ -93,7 +107,7 @@
             }
 
             currentMenu.forEach((item, index) => {
-                let labelStatus = item.isBestSeller ? ' <span style="color:#e67e22;">[⭐ Best Seller]</span>' : '';
+                let labelStatus = item.isBestSeller ? ' <span style="color:#e67e22;">[🔥 Best Seller]</span>' : '';
                 adminMenuList.innerHTML += `
                     <div class="preview-item">
                         <div>
@@ -112,36 +126,53 @@
             const price = document.getElementById('cakePrice').value;
             const isPromo = document.getElementById('isPromo').checked;
             const promoPrice = document.getElementById('cakePromoPrice').value;
-            const isBestSeller = document.getElementById('isBestSeller').checked; // Mengambil status checkbox Best Seller baru
+            const isBestSeller = document.getElementById('isBestSeller').checked;
             const desc = document.getElementById('cakeDesc').value;
             const imageFile = document.getElementById('cakeImage').files[0];
 
-            const reader = new FileReader();
-            reader.onloadend = function() {
-                const newCake = {
-                    name, price, isPromo, promoPrice, isBestSeller, desc, image: reader.result
-                };
-
-                let currentMenu = JSON.parse(localStorage.getItem('umkm_menu')) || [];
-                currentMenu.push(newCake);
-                localStorage.setItem('umkm_menu', JSON.stringify(currentMenu));
-
-                menuForm.reset();
-                togglePromoField();
-                displayAdminMenu();
-                alert('Hore! Menu baru berhasil dimasukkan dan disinkronkan!');
-            }
-
             if (imageFile) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const img = new Image();
+                    img.src = event.target.result;
+                    img.onload = function() {
+                        // KOMPRESI GAMBAR otomatis biar local storage gak crash/penuh
+                        const canvas = document.createElement('canvas');
+                        const MAX_WIDTH = 500;
+                        const scaleSize = MAX_WIDTH / img.width;
+                        canvas.width = MAX_WIDTH;
+                        canvas.height = img.height * scaleSize;
+
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+                        const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+
+                        const newCake = {
+                            name, price, isPromo, promoPrice, isBestSeller, desc, image: compressedBase64
+                        };
+
+                        let currentMenu = JSON.parse(localStorage.getItem('umkm_menu')) || [];
+                        currentMenu.push(newCake);
+                        localStorage.setItem('umkm_menu', JSON.stringify(currentMenu));
+
+                        menuForm.reset();
+                        togglePromoField();
+                        displayAdminMenu();
+                        alert('Hore! Menu baru berhasil dimasukkan dan disinkronkan!');
+                    };
+                };
                 reader.readAsDataURL(imageFile);
             }
         });
 
         function deleteMenu(index) {
-            let currentMenu = JSON.parse(localStorage.getItem('umkm_menu')) || [];
-            currentMenu.splice(index, 1);
-            localStorage.setItem('umkm_menu', JSON.stringify(currentMenu));
-            displayAdminMenu();
+            if(confirm('Apakah Anda yakin ingin menghapus menu ini?')) {
+                let currentMenu = JSON.parse(localStorage.getItem('umkm_menu')) || [];
+                currentMenu.splice(index, 1);
+                localStorage.setItem('umkm_menu', JSON.stringify(currentMenu));
+                displayAdminMenu();
+            }
         }
 
         displayAdminMenu();

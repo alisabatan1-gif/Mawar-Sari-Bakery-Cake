@@ -3,59 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Admin UMKM</title>
+    <title>Login Admin - Mawar Sari</title>
     <style>
-        body { font-family: Arial, sans-serif; background-color: #f4f4f4; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .login-container { background: white; padding: 30px; border-radius: 8px; box-shadow: 0px 0px 10px rgba(0,0,0,0.1); width: 300px; }
-        h2 { text-align: center; margin-bottom: 20px; color: #333; }
-        .input-group { margin-bottom: 15px; }
-        .input-group label { display: block; margin-bottom: 5px; font-weight: bold; }
-        .input-group input { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-        button { width: 100%; padding: 10px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; }
-        button:hover { background-color: #45a049; }
-        .error-msg { color: red; font-size: 14px; text-align: center; margin-top: 10px; display: none; }
+        body { font-family: Arial, sans-serif; background: #fdf6f0; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .login-box { background: white; padding: 40px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); width: 100%; max-width: 380px; box-sizing: border-box; }
+        .login-box h2 { text-align: center; margin-bottom: 25px; color: #e67e22; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: bold; }
+        .form-group input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; font-size: 16px; }
+        .btn-login { width: 100%; padding: 12px; background: #e67e22; border: none; color: white; font-weight: bold; font-size: 16px; border-radius: 5px; cursor: pointer; }
+        .btn-login:hover { background: #d35400; }
+        .back-link { display: block; text-align: center; margin-top: 15px; color: #888; text-decoration: none; }
     </style>
 </head>
 <body>
 
-<div class="login-container">
+<div class="login-box">
     <h2>Login Admin</h2>
     <form id="loginForm">
-        <div class="input-group">
-            <label>Email</label>
-            <input type="email" id="email" required placeholder="admin@mawarsari.com">
+        <div class="form-group">
+            <label for="username">Username:</label>
+            <input type="text" id="username" required placeholder="Masukkan username">
         </div>
-        <div class="input-group">
-            <label>Password</label>
-            <input type="password" id="password" required placeholder="******">
+        <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" id="password" required placeholder="Masukkan password">
         </div>
-        <button type="submit">Masuk</button>
-        <p class="error-msg" id="errorMsg">Email atau Password salah!</p>
+        <button type="submit" class="btn-login">Masuk</button>
     </form>
+    <a href="index.html" class="back-link">⬅️ Kembali ke Toko</a>
 </div>
 
 <script>
     document.getElementById('loginForm').addEventListener('submit', function(e) {
         e.preventDefault();
-        
-        const emailInput = document.getElementById('email').value;
-        const passwordInput = document.getElementById('password').value;
+        const user = document.getElementById('username').value;
+        const pass = document.getElementById('password').value;
 
-        // --- ATUR EMAIL & PASSWORD KAMU DI SINI ---
-        const validEmail = "admin@mawarsari.com";
-        const validPassword = "passwordrahasia123"; 
-
-        if (emailInput === validEmail && passwordInput === validPassword) {
-            // Jika benar, simpan status login ke Session Storage
+        // Silakan ubah username dan password di bawah ini sesuai kebutuhan Anda
+        if (user === 'adminmawarsari' && pass === 'mawarsari123') {
             sessionStorage.setItem('isAdminLoggedIn', 'true');
-            // Alihkan halaman ke admin.html
+            alert('Login berhasil!');
             window.location.href = 'admin.html';
         } else {
-            // Jika salah, tampilkan pesan error
-            document.getElementById('errorMsg').style.display = 'block';
+            alert('Username atau password salah!');
         }
     });
 </script>
-
 </body>
 </html>
