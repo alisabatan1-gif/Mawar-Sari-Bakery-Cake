@@ -5,48 +5,54 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login Admin - Mawar Sari</title>
     <style>
-        body { font-family: Arial, sans-serif; background: #fdf6f0; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .login-box { background: white; padding: 40px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); width: 100%; max-width: 380px; box-sizing: border-box; }
-        .login-box h2 { text-align: center; margin-bottom: 25px; color: #e67e22; }
-        .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; margin-bottom: 8px; font-weight: bold; }
-        .form-group input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; font-size: 16px; }
-        .btn-login { width: 100%; padding: 12px; background: #e67e22; border: none; color: white; font-weight: bold; font-size: 16px; border-radius: 5px; cursor: pointer; }
-        .btn-login:hover { background: #d35400; }
-        .back-link { display: block; text-align: center; margin-top: 15px; color: #888; text-decoration: none; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f5f5f5; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .login-card { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 350px; box-sizing: border-box; }
+        .login-card h2 { text-align: center; margin-bottom: 25px; color: #2c3e50; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; color: #34495e; }
+        .form-group input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+        .btn-login { background-color: #e67e22; color: white; border: none; padding: 12px; width: 100%; font-size: 16px; font-weight: bold; border-radius: 5px; cursor: pointer; margin-top: 10px; }
+        .btn-login:hover { background-color: #d35400; }
+        .error-message { color: #e74c3c; font-size: 14px; text-align: center; margin-bottom: 15px; display: none; }
     </style>
 </head>
 <body>
 
-<div class="login-box">
+<div class="login-card">
     <h2>Login Admin</h2>
+    <div class="error-message" id="errorMsg">Username or password incorrect!</div>
+    
     <form id="loginForm">
         <div class="form-group">
             <label for="username">Username:</label>
-            <input type="text" id="username" required placeholder="Masukkan username">
+            <input type="text" id="username" required placeholder="Masukkan username admin">
         </div>
         <div class="form-group">
             <label for="password">Password:</label>
-            <input type="password" id="password" required placeholder="Masukkan password">
+            <input type="password" id="password" required placeholder="Masukkan password admin">
         </div>
-        <button type="submit" class="btn-login">Masuk</button>
+        <button type="submit" class="btn-login">Masuk Halaman Admin</button>
     </form>
-    <a href="index.html" class="back-link">⬅️ Kembali ke Toko</a>
 </div>
 
 <script>
     document.getElementById('loginForm').addEventListener('submit', function(e) {
         e.preventDefault();
+        
         const user = document.getElementById('username').value;
         const pass = document.getElementById('password').value;
+        const errorMsg = document.getElementById('errorMsg');
 
-        // Silakan ubah username dan password di bawah ini sesuai kebutuhan Anda
+        // Kredensial masuk yang disesuaikan dengan sistem Anda
         if (user === 'adminmawarsari' && pass === 'mawarsari123') {
-            sessionStorage.setItem('isAdminLoggedIn', 'true');
-            alert('Login berhasil!');
+            // MENYIMPAN STATUS LOGIN YANG DISINKRONKAN DENGAN KODE ADMIN BARU
+            sessionStorage.setItem('status_login', 'sukses_masuk');
+            
+            alert('Login berhasil! Mengalihkan ke panel kontrol...');
             window.location.href = 'admin.html';
         } else {
-            alert('Username atau password salah!');
+            errorMsg.style.display = 'block';
+            document.getElementById('password').value = '';
         }
     });
 </script>

@@ -10,13 +10,12 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&family=Playfair+Display:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
-    <!-- FONT AWESOME (IKON) -->
+    <!-- FONT AWESOME -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    
     <!-- AOS ANIMATION CSS -->
     <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
 
-    <!-- LOAD SDK FIREBASE SEBELUM SCRIPT UTAMA -->
+    <!-- LOAD SDK FIREBASE V8 -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 </head>
@@ -91,15 +90,12 @@
         <p class="copyright">© 2026 Mawar Sari Bakery & Cake. All Rights Reserved.</p>
     </div>
 
-    <!-- LOADING ANIMATION -->
     <div id="loader">
         <div class="spinner"></div>
     </div>
 
-    <!-- TOMBOL SCROLL TO TOP -->
     <button id="scrollTopBtn" title="Kembali ke atas"><i class="fas fa-arrow-up"></i></button>
 
-    <!-- TOMBOL WHATSAPP MENGAMBANG -->
     <a href="https://wa.me/6281292330422?text=Halo%20Mawar%20Sari,%20saya%20mau%20tanya%20seputar%20kue" class="floating-wa" target="_blank" title="Chat WhatsApp">
         <i class="fab fa-whatsapp"></i>
     </a>
@@ -107,11 +103,10 @@
     <!-- SCRIPTS -->
     <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
     <script>
-        // CONFIG FIREBASE ALI SABATAN (Sinkron dengan admin & menu)
         const firebaseConfig = {
             apiKey: "AIzaSyBV6z7KT4OM8QiopYoFbRUGI6248HEkE8w",
             authDomain: "mawar-sari-bakery.firebaseapp.com",
-            databaseURL: "https://mawar-sari-bakery-default-rtdb.firebaseio.com",
+            databaseURL: "https://mawar-sari-bakery-default-rtdb.asia-southeast1.firebasedatabase.app",
             projectId: "mawar-sari-bakery",
             storageBucket: "mawar-sari-bakery.firebasestorage.app",
             messagingSenderId: "100804150468",
@@ -130,13 +125,12 @@
             if (!cardContainer) return;
 
             if (bestSellerProducts.length === 0) {
-                cardContainer.parentElement.innerHTML = `<p style="text-align:center; color:#888;">Belum ada produk Best Seller yang dimasukkan.</p>`;
+                cardContainer.innerHTML = `<p style="text-align:center; color:#888;">Belum ada produk Best Seller yang dimasukkan.</p>`;
                 return;
             }
 
             renderKartuSatuSaja();
             
-            // Hapus interval lama agar tidak menumpuk saat reload data realtime
             if(sliderInterval) clearInterval(sliderInterval);
             sliderInterval = setInterval(gantiKueOtomatis, 4000);
         }
@@ -148,18 +142,13 @@
             const item = bestSellerProducts[indeksSekarang];
             let hargaTampilan = `<p class="product-price">Rp ${parseInt(item.price).toLocaleString('id-ID')}</p>`;
             
-            // Logika pengecekan promo (jika ada data promo dari cloud)
-            if (item.isPromo && item.promoPrice) {
-                hargaTampilan = `
-                    <p class="product-price" style="color: #e74c3c; font-weight: bold;">Rp ${parseInt(item.promoPrice).toLocaleString('id-ID')}</p>
-                    <p style="text-decoration: line-through; color: #888; font-size: 14px; margin-top: -5px;">Rp ${parseInt(item.price).toLocaleString('id-ID')}</p>
-                `;
-            }
-
+            // Validasi keberadaan link gambar dari Firebase Storage
+            const tautanGambar = item.image ? item.image : 'toko.jpeg';
+            
             cardContainer.innerHTML = `
                 <span class="badge-laris">Best Seller</span>
                 <span class="slider-number" style="position: absolute; top: 15px; right: 15px; background: rgba(0,0,0,0.5); color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: 500;">${indeksSekarang + 1}/${bestSellerProducts.length}</span>
-                <img src="${item.image || 'toko.jpeg'}" alt="${item.name}" class="product-img">
+                <img src="${tautanGambar}" alt="${item.name}" class="product-img">
                 <div class="product-info">
                     <h3>${item.name}</h3>
                     ${hargaTampilan}
@@ -193,28 +182,21 @@
         
         function prosesBeli(namaKue) {
             const produkDipilih = bestSellerProducts.find(item => item.name === namaKue);
-            let hargaAplikasi = produkDipilih.price;
-            if (produkDipilih.isPromo && produkDipilih.promoPrice) {
-                hargaAplikasi = produkDipilih.promoPrice;
-            }
-            
             const dataCheckout = {
                 name: produkDipilih.name,
-                price: hargaAplikasi,
+                price: produkDipilih.price,
                 image: produkDipilih.image || 'toko.jpeg'
             };
-            
             localStorage.setItem('produk_checkout', JSON.stringify(dataCheckout));
             window.location.href = 'checkout.html';
         }
 
-        // AMBIL DATA REALTIME DARI FIREBASE KATEGORI BEST SELLER
+        // Tangkap event database live dari server
         database.ref('katalog_menu').on('value', function(snapshot) {
             bestSellerProducts = [];
             if (snapshot.exists()) {
                 snapshot.forEach((childSnapshot) => {
                     const item = childSnapshot.val();
-                    // Masukkan kue jika kategorinya di-set ke 'best_seller' oleh admin
                     if (item.kategori === 'best_seller') {
                         bestSellerProducts.push(item);
                     }

@@ -23,7 +23,7 @@
         .badge-kategori { background: #3498db; color: white; padding: 3px 8px; border-radius: 20px; font-size: 11px; display: inline-block; width: max-content; margin-bottom: 8px; }
     </style>
 
-    <!-- SDK FIREBASE REAL-TIME -->
+    <!-- SDK FIREBASE V8 -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 </head>
@@ -42,11 +42,10 @@
 </div>
 
 <script>
-    // KONFIGURASI FIREBASE KONSISTEN
     const firebaseConfig = {
         apiKey: "AIzaSyBV6z7KT4OM8QiopYoFbRUGI6248HEkE8w",
         authDomain: "mawar-sari-bakery.firebaseapp.com",
-        databaseURL: "https://mawar-sari-bakery-default-rtdb.firebaseio.com",
+        databaseURL: "https://mawar-sari-bakery-default-rtdb.asia-southeast1.firebasedatabase.app",
         projectId: "mawar-sari-bakery",
         storageBucket: "mawar-sari-bakery.firebasestorage.app",
         messagingSenderId: "100804150468",
@@ -58,7 +57,7 @@
 
     const menuGridBox = document.getElementById('menuGridBox');
 
-    // AKTIFKAN EVENT LISTENER LIVE CLOUD (.on)
+    // Dengar perubahan database katalog secara aktif
     database.ref('katalog_menu').on('value', function(snapshot) {
         menuGridBox.innerHTML = "";
         
@@ -75,8 +74,11 @@
             
             const teksKategori = item.kategori === 'best_seller' ? 'Best Seller ⭐' : 'Pilihan Premium';
             
+            // Render URL gambar cloud asli hasil upload admin
+            const tautanGambarKatalog = item.image ? item.image : 'toko.jpeg';
+            
             card.innerHTML = `
-                <img src="${item.image || 'toko.jpeg'}" alt="${item.name}">
+                <img src="${tautanGambarKatalog}" alt="${item.name}">
                 <div class="card-body">
                     <span class="badge-kategori" style="${item.kategori === 'best_seller' ? 'background:#e74c3c;' : ''}">${teksKategori}</span>
                     <h3>${item.name}</h3>
@@ -92,13 +94,11 @@
 
     function alihkanKeCheckout(encodedData) {
         const itemObj = JSON.parse(decodeURIComponent(encodedData));
-        
         const dataCheckout = {
             name: itemObj.name,
             price: itemObj.price,
             image: itemObj.image || 'toko.jpeg'
         };
-        
         localStorage.setItem('produk_checkout', JSON.stringify(dataCheckout));
         window.location.href = 'checkout.html';
     }
