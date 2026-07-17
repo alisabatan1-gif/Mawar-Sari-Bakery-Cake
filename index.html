@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mawar Sari Bakery & Cake - Premium Quality</title>
-    <link rel="stylesheet" href="style.css">
     
     <!-- GOOGLE FONTS -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -19,72 +18,299 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
-    <!-- STYLE TAMBAHAN NAVBAR & RESPONSIF LAPTOP/HP -->
+    <!-- STYLE RESPONSIF OTOMATIS (SUPAYA TIDAK BERANTAKAN DI HP/LAPTOP) -->
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+            scroll-behavior: smooth;
+        }
+
         html, body {
             width: 100%;
             overflow-x: hidden;
+            background-color: #faf9f6;
+            color: #333;
         }
+
+        /* NAVIGATION BAR */
         .navbar {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
-            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            padding: 20px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: transparent;
+            transition: all 0.3s ease;
             z-index: 1000;
         }
 
-        .navbar .logo,
-        .navbar .nav-links a,
-        .navbar .menu-toggle {
-            transition: color 0.3s ease;
+        .navbar .logo {
+            font-weight: 700;
+            font-size: 20px;
+            color: #ffffff;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.6);
         }
 
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 25px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #ffffff;
+            font-weight: 500;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.6);
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #E48227;
+        }
+
+        .menu-toggle {
+            display: none;
+            font-size: 28px;
+            color: #ffffff;
+            cursor: pointer;
+        }
+
+        /* NAVBAR KETIKA DI-SCROLL */
         .navbar.scrolled {
             background-color: #ffffff !important;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            padding: 15px 5%;
         }
 
         .navbar.scrolled .logo,
         .navbar.scrolled .nav-links a,
         .navbar.scrolled .menu-toggle {
             color: #111827 !important;
+            text-shadow: none !important;
         }
 
-        @media screen and (min-width: 1024px) {
-            .hero-section {
-                height: 100vh !important;
-                min-height: 700px !important;
-                display: flex !important;
-                flex-direction: column !important;
-                align-items: center !important;
-                justify-content: center !important;
-                padding: 0 5% !important;
+        /* HERO SECTION */
+        .hero-section {
+            background-image: linear-gradient(180deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.7) 100%), url('toko.jpeg');
+            background-repeat: no-repeat;
+            background-position: center center;
+            background-size: cover;
+            height: 100vh;
+            min-height: 600px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 0 20px;
+        }
+
+        .hero-content {
+            max-width: 900px;
+            width: 100%;
+            z-index: 2;
+        }
+
+        .hero-content h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2.2rem, 5vw, 4rem);
+            color: #ffffff;
+            line-height: 1.2;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.7);
+        }
+
+        .hero-content p {
+            font-size: clamp(1rem, 2vw, 1.25rem);
+            color: #f3f4f6;
+            line-height: 1.6;
+            margin-bottom: 35px;
+            text-shadow: 1px 1px 4px rgba(0,0,0,0.6);
+        }
+
+        .btn-primary {
+            display: inline-block;
+            background-color: #E48227;
+            color: #ffffff;
+            padding: 14px 35px;
+            border-radius: 30px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: background 0.3s, transform 0.2s;
+            box-shadow: 0 4px 15px rgba(228, 130, 39,.4);
+        }
+
+        .btn-primary:hover {
+            background-color: #d2731e;
+            transform: translateY(-2px);
+        }
+
+        /* SECTION TENTANG KAMI */
+        .section-container {
+            padding: 80px 8%;
+            text-align: center;
+            background-color: #ffffff;
+        }
+
+        .section-container h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.8rem, 3vw, 2.5rem);
+            margin-bottom: 40px;
+            color: #1f2937;
+        }
+
+        .grid-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 25px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .feature-card {
+            background: #fffdf9;
+            padding: 30px;
+            border-radius: 16px;
+            border: 1px solid #f3f4f6;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            text-align: left;
+        }
+
+        .feature-card h3 {
+            font-size: 1.15rem;
+            margin-bottom: 12px;
+            color: #B93C28;
+        }
+
+        .feature-card p {
+            font-size: 0.95rem;
+            color: #6b7280;
+            line-height: 1.6;
+        }
+
+        /* SECTION PRODUK BEST SELLER */
+        .product-section {
+            padding: 80px 8%;
+            background-color: #faf9f6;
+            text-align: center;
+        }
+
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.8rem, 3vw, 2.5rem);
+            color: #1f2937;
+            margin-bottom: 10px;
+        }
+
+        .section-subtitle {
+            color: #6b7280;
+            margin-bottom: 40px;
+            font-size: 1rem;
+        }
+
+        #sliderCardContainer {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 25px;
+            max-width: 1100px;
+            margin: 0 auto;
+            justify-items: center;
+        }
+
+        .see-all-container {
+            margin-top: 50px;
+        }
+
+        .btn-secondary {
+            display: inline-block;
+            background-color: transparent;
+            color: #E48227;
+            border: 2px solid #E48227;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-weight: 700;
+            text-decoration: none;
+            margin-top: 15px;
+            transition: all 0.3s;
+        }
+
+        .btn-secondary:hover {
+            background-color: #E48227;
+            color: #fff;
+        }
+
+        /* FOOTER */
+        .footer-section {
+            background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+            color: white;
+            padding: 60px 8%;
+            text-align: center;
+        }
+
+        .footer-section h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            margin-bottom: 15px;
+        }
+
+        .footer-section p {
+            color: #9ca3af;
+            margin-bottom: 25px;
+        }
+
+        .btn-whatsapp {
+            display: inline-block;
+            background-color: #2ECC71;
+            color: white;
+            padding: 14px 30px;
+            border-radius: 30px;
+            font-weight: bold;
+            text-decoration: none;
+            box-shadow: 0 4px 15px rgba(46, 204, 113, 0.4);
+            transition: background 0.3s;
+        }
+
+        .btn-whatsapp:hover {
+            background-color: #27ae60;
+        }
+
+        .copyright {
+            margin-top: 40px;
+            font-size: 0.85rem;
+            color: #6b7280;
+        }
+
+        /* MEDIA QUERY HP (Responsive Menu Dropdown) */
+        @media screen and (max-width: 768px) {
+            .menu-toggle {
+                display: block;
             }
-            .hero-content {
-                max-width: 1100px !important;
-                width: 90% !important;
-                text-align: center !important;
-                margin: 0 auto !important;
+            .nav-links {
+                display: none;
+                flex-direction: column;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                background: #ffffff;
+                padding: 20px 0;
+                box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+                text-align: center;
             }
-            .hero-content h1 {
-                font-size: 3.8rem !important;
-                line-height: 1.25 !important;
-                margin-bottom: 25px !important;
+            .nav-links.active {
+                display: flex;
             }
-            .hero-content p {
-                font-size: 1.3rem !important;
-                line-height: 1.6 !important;
-                margin-bottom: 40px !important;
-                max-width: 850px !important;
-                margin-left: auto !important;
-                margin-right: auto !important;
-            }
-            .hero-content .btn-primary {
-                font-size: 1.1rem !important;
-                padding: 16px 50px !important;
-                border-radius: 35px !important;
-                display: inline-block !important;
+            .nav-links a {
+                color: #111827 !important;
+                text-shadow: none !important;
+                font-size: 1.1rem;
+                padding: 10px 0;
             }
         }
     </style>
@@ -92,7 +318,7 @@
 <body>
 
     <!-- NAVIGATION BAR -->
-    <div class="navbar">
+    <nav class="navbar" id="navbar">
         <div class="logo">Mawar Sari Bakery & Cake</div>
         <div class="menu-toggle" id="menu-toggle">☰</div>
         <ul class="nav-links" id="nav-links">
@@ -101,19 +327,19 @@
             <li><a href="#produk">Produk</a></li>
             <li><a href="#kontak">Hubungi Kami</a></li>
         </ul>
-    </div>
+    </nav>
 
     <!-- HERO SECTION -->
-    <div id="home" class="hero-section">
+    <header id="home" class="hero-section">
         <div class="hero-content">
             <h1>Kelembutan Autentik<br> Mawar Sari Bakery & Cake</h1>
-            <p>Menghadirkan kebahagian roti segar dan kue ulang tahun premium pilihan keluarga yang dibuat dengan penuh cinta setiap hari</p>
+            <p>Menghadirkan kebahagiaan roti segar dan kue ulang tahun premium pilihan keluarga yang dibuat dengan penuh cinta setiap hari.</p>
             <a href="#produk" class="btn-primary">Lihat Menu</a>
         </div>
-    </div>
+    </header>
 
     <!-- TENTANG KAMI -->
-    <div id="tentang" class="section-container bg-light">
+    <section id="tentang" class="section-container">
         <h2>Kemurnian Rasa di Setiap Gigitan</h2>
         <div class="grid-features">
             <div class="feature-card">
@@ -129,72 +355,44 @@
                 <p>Menghadirkan harmoni rasa kue kelas dunia dengan sentuhan penuh kasih, menciptakan kemewahan kuliner yang dapat dinikmati semua kalangan.</p>
             </div>
         </div>
-    </div>
+    </section>
 
     <!-- SECTION PRODUK BEST SELLER -->
     <section id="produk" class="product-section">
-        <div class="container" style="width: 100%; max-width: 1200px; margin: 0 auto;">
-            <h2 class="section-title">Produk Best Seller</h2>
-            <p class="section-subtitle">Varian paling favorit yang paling sering diburu pelanggan setia kami.</p>
-            
-            <div style="display: flex; justify-content: center; padding: 20px; width: 100%;">
-                <div id="sliderCardContainer" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; width: 100%; max-width: 1100px;">
-                    <p style="text-align:center; color:#888;">Menghubungkan ke database kue...</p>
-                </div>
-            </div>
+        <h2 class="section-title">Produk Best Seller</h2>
+        <p class="section-subtitle">Varian paling favorit yang paling sering diburu pelanggan setia kami.</p>
+        
+        <div id="sliderCardContainer">
+            <p style="text-align:center; color:#888; grid-column: 1/-1;">Menghubungkan ke database kue...</p>
+        </div>
 
-            <div class="see-all-container">
-                <p>Mau lihat varian roti dan kue lezat lainnya?</p>
-                <a href="menu.html" class="btn-secondary">Lihat Semua List Kue ➡️</a>
-            </div>
+        <div class="see-all-container">
+            <p style="color: #4b5563;">Mau lihat varian roti dan kue lezat lainnya?</p>
+            <a href="menu.html" class="btn-secondary">Lihat Semua List Kue ➡️</a>
         </div>
     </section>
 
     <!-- KONTAK & FOOTER -->
-    <div id="kontak" class="footer-section">
+    <footer id="kontak" class="footer-section">
         <h2>Tertarik Mencoba?</h2>
-        <p>Pesan sekarang juga melalui WhatsApp untuk mendapatkan promo gratis ongkir minggu ini!</p>
+        <p>Pesan sekarang juga melalui WhatsApp untuk mendapatkan promo menarik minggu ini!</p>
         <a href="https://wa.me/6281292330422?text=Halo%20Mawar%20Sari,%20saya%20mau%20order" target="_blank" class="btn-whatsapp">
             💬 Order Lewat WhatsApp
         </a>
 
         <!-- TOMBOL LOGIN ADMIN -->
-        <div style="margin-top: 40px; margin-bottom: 10px; text-align: center;">
-            <a href="login.html" style="display: inline-block; background-color: rgba(255, 255, 255, 0.07); color: #bbb; border: 1px solid rgba(255, 255, 255, 0.15); padding: 8px 18px; border-radius: 20px; font-size: 12px; text-decoration: none; transition: all 0.3s ease; font-family: 'Inter', sans-serif;" onmouseover="this.style.backgroundColor='rgba(255, 255, 255, 0.15)'; this.style.color='#fff';" onmouseout="this.style.backgroundColor='rgba(255, 255, 255, 0.07)'; this.style.color='#bbb';">
+        <div style="margin-top: 35px; text-align: center;">
+            <a href="login.html" style="display: inline-block; background-color: rgba(255, 255, 255, 0.08); color: #9ca3af; border: 1px solid rgba(255, 255, 255, 0.15); padding: 8px 18px; border-radius: 20px; font-size: 12px; text-decoration: none; transition: all 0.3s ease;">
                 🔓 Log In Panel Admin
             </a>
         </div>
 
         <p class="copyright">© 2026 Mawar Sari Bakery & Cake. All Rights Reserved.</p>
-    </div>
-
-    <div id="loader">
-        <div class="spinner"></div>
-    </div>
-
-    <button id="scrollTopBtn" title="Kembali ke atas"><i class="fas fa-arrow-up"></i></button>
-
-    <a href="https://wa.me/6281292330422?text=Halo%20Mawar%20Sari,%20saya%20mau%20tanya%20seputar%20kue" class="floating-wa" target="_blank" title="Chat WhatsApp">
-        <i class="fab fa-whatsapp"></i>
-    </a>
+    </footer>
 
     <!-- SCRIPTS -->
     <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
     <script>
-        // ======= PENGAMAN TAMBAHAN: PAKSA UKURAN VIA JS JIKA DI LAPTOP =======
-        window.addEventListener('DOMContentLoaded', () => {
-            if (window.innerWidth >= 1024) {
-                const hero = document.getElementById('home');
-                if (hero) {
-                    hero.style.height = '100vh';
-                    hero.style.minHeight = '700px';
-                    hero.style.display = 'flex';
-                    hero.style.alignItems = 'center';
-                    hero.style.justifyContent = 'center';
-                }
-            }
-        });
-
         // ======= 1. KONFIGURASI FIREBASE RESMI =======
         const firebaseConfig = {
             apiKey: "AIzaSyBV6z7KT4OM8QiopYoFbRUGI6248HEkE8w",
@@ -209,7 +407,7 @@
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
-        // ======= 2. SCRIPT BAWAAN TEMPLATE =======
+        // ======= 2. TOGGLE MENU HP =======
         const menuToggle = document.getElementById("menu-toggle");
         const navLinks = document.getElementById("nav-links");
         if (menuToggle && navLinks) {
@@ -218,43 +416,17 @@
             });
         }
 
-        if (typeof AOS !== 'undefined') {
-            AOS.init({ once: true });
-        }
-
-        window.addEventListener('load', function() {
-            const loader = document.getElementById('loader');
-            if (loader) {
-                loader.style.opacity = '0';
-                setTimeout(() => { loader.style.display = 'none'; }, 500);
-            }
-        });
-
-        const scrollTopBtn = document.getElementById('scrollTopBtn');
-        if (scrollTopBtn) {
-            window.addEventListener('scroll', function() {
-                if (window.scrollY > 300) { 
-                    scrollTopBtn.classList.add('show'); 
-                } else { 
-                    scrollTopBtn.classList.remove('show'); 
-                }
-            });
-
-            scrollTopBtn.addEventListener('click', function() {
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            });
-        }
-
+        // ======= 3. EFEK NAVBAR BERUBAH SAAT SCROLL =======
         window.addEventListener('scroll', function() {
-            const navbar = document.querySelector('.navbar');
-            if (window.scrollY > 50) {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 40) {
                 navbar.classList.add('scrolled');
             } else {
                 navbar.classList.remove('scrolled');
             }
         });
 
-        // ======= 3. KONEKSI KE FIREBASE UNTUK PRODUK BEST SELLER =======
+        // ======= 4. KONEKSI KE FIREBASE UNTUK PRODUK BEST SELLER =======
         const bSellerContainer = document.getElementById('sliderCardContainer');
         let bestSellerProducts = [];
 
@@ -273,7 +445,7 @@
             bestSellerProducts = [];
             
             if (!data) {
-                bSellerContainer.innerHTML = `<p style="text-align:center; color:#888; font-style:italic; width: 100%;">Belum ada menu Best Seller yang dipasang.</p>`;
+                bSellerContainer.innerHTML = `<p style="text-align:center; color:#888; font-style:italic; grid-column: 1/-1;">Belum ada menu Best Seller yang dipasang.</p>`;
                 return;
             }
 
@@ -292,9 +464,8 @@
                     });
 
                     const card = document.createElement('div');
-                    card.style.width = "250px";
                     card.style.backgroundColor = "#ffffff";
-                    card.style.borderRadius = "20px";
+                    card.style.borderRadius = "16px";
                     card.style.border = "1px solid #f3f4f6";
                     card.style.boxShadow = "0 4px 15px rgba(0,0,0,0.04)";
                     card.style.padding = "16px";
@@ -302,12 +473,14 @@
                     card.style.flexDirection = "column";
                     card.style.gap = "12px";
                     card.style.textAlign = "left";
-                    card.style.boxSizing = "border-box";
+                    card.style.width = "100%";
+                    card.style.maxWidth = "280px";
+                    card.style.margin = "0 auto";
                     card.style.transition = "transform 0.2s ease, box-shadow 0.2s ease";
 
                     card.onmouseover = function() {
                         card.style.transform = "translateY(-4px)";
-                        card.style.boxShadow = "0 6px 20px rgba(0,0,0,0.08)";
+                        card.style.boxShadow = "0 8px 25px rgba(0,0,0,0.08)";
                     };
                     card.onmouseout = function() {
                         card.style.transform = "translateY(0)";
@@ -315,14 +488,14 @@
                     };
                     
                     card.innerHTML = `
-                        <div style="width: 100%; height: 150px; border-radius: 16px; overflow: hidden; background-color: #f3f4f6;">
+                        <div style="width: 100%; height: 160px; border-radius: 12px; overflow: hidden; background-color: #f3f4f6;">
                             <img src="${gambarAman}" alt="${namaAman}" style="width: 100%; height: 100%; object-fit: cover;">
                         </div>
                         <div style="display: flex; flex-direction: column; gap: 4px;">
-                            <h3 style="font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 700; color: #111827; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${namaAman}">${namaAman}</h3>
-                            <p style="font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 800; color: #E48227; margin: 0;">Rp ${formatRupiahHP(hargaAman)}</p>
+                            <h3 style="font-size: 16px; font-weight: 700; color: #111827; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${namaAman}">${namaAman}</h3>
+                            <p style="font-size: 15px; font-weight: 800; color: #E48227; margin: 0;">Rp ${formatRupiahHP(hargaAman)}</p>
                         </div>
-                        <button onclick="prosesBeli('${namaAman.replace(/'/g, "\\'")}')" style="width: 100%; background-color: #E48227; color: #ffffff; border: none; border-radius: 12px; padding: 10px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif; transition: background-color 0.2s; margin-top: auto;">
+                        <button onclick="prosesBeli('${namaAman.replace(/'/g, "\\'")}')" style="width: 100%; background-color: #E48227; color: #ffffff; border: none; border-radius: 10px; padding: 10px; font-size: 13px; font-weight: 700; cursor: pointer; transition: background-color 0.2s; margin-top: auto;">
                             Beli Sekarang
                         </button>
                     `;
@@ -331,11 +504,11 @@
             });
 
             if (bestSellerProducts.length === 0) {
-                bSellerContainer.innerHTML = `<p style="text-align:center; color:#888; font-style:italic; width: 100%;">Belum ada menu Best Seller saat ini.</p>`;
+                bSellerContainer.innerHTML = `<p style="text-align:center; color:#888; font-style:italic; grid-column: 1/-1;">Belum ada menu Best Seller saat ini.</p>`;
             }
         });
 
-        // ======= 4. PROSES KIRIM DATA PRODUK KE CHECKOUT =======
+        // ======= 5. PROSES KIRIM DATA PRODUK KE CHECKOUT =======
         function prosesBeli(namaKue) {
             const produkDipilih = bestSellerProducts.find(item => item.name === namaKue);
             
