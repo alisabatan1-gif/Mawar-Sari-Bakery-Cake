@@ -87,6 +87,14 @@
         <a href="https://wa.me/6281292330422?text=Halo%20Mawar%20Sari,%20saya%20mau%20order" target="_blank" class="btn-whatsapp">
             💬 Order Lewat WhatsApp
         </a>
+
+        <!-- TOMBOL LOGIN ADMIN (Disisipkan Rapi Sesuai Tema Gelap Footer) -->
+        <div style="margin-top: 40px; margin-bottom: 10px; text-align: center;">
+            <a href="login.html" style="display: inline-block; background-color: rgba(255, 255, 255, 0.07); color: #bbb; border: 1px solid rgba(255, 255, 255, 0.15); padding: 8px 18px; border-radius: 20px; font-size: 12px; text-decoration: none; transition: all 0.3s ease; font-family: 'Inter', sans-serif;" onmouseover="this.style.backgroundColor='rgba(255, 255, 255, 0.15)'; this.style.color='#fff';" onmouseout="this.style.backgroundColor='rgba(255, 255, 255, 0.07)'; this.style.color='#bbb';">
+                🔓 Log In Panel Admin
+            </a>
+        </div>
+
         <p class="copyright">© 2026 Mawar Sari Bakery & Cake. All Rights Reserved.</p>
     </div>
 
@@ -103,6 +111,7 @@
     <!-- SCRIPTS -->
     <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
     <script>
+        // ======= 1. KONFIGURASI FIREBASE RESMI =======
         const firebaseConfig = {
             apiKey: "AIzaSyBV6z7KT4OM8QiopYoFbRUGI6248HEkE8w",
             authDomain: "mawar-sari-bakery.firebaseapp.com",
@@ -113,123 +122,124 @@
             appId: "1:100804150468:web:fdb97e55881183f69d7591"
         };
         
+        // Inisialisasi Firebase
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
+        // ======= 2. SCRIPT ASLI BAWAAN TEMPLATE ANDA (JANGAN DIUBAH) =======
+        const menuToggle = document.getElementById("menu-toggle");
+        const navLinks = document.getElementById("nav-links");
+        if (menuToggle && navLinks) {
+            menuToggle.addEventListener("click", function() { 
+                navLinks.classList.toggle("active"); 
+            });
+        }
+
+        // Animasi AOS
+        if (typeof AOS !== 'undefined') {
+            AOS.init({ once: true });
+        }
+
+        // Loader Screen
+        window.addEventListener('load', function() {
+            const loader = document.getElementById('loader');
+            if (loader) {
+                loader.style.opacity = '0';
+                setTimeout(() => { loader.style.display = 'none'; }, 500);
+            }
+        });
+
+        // Tombol Scroll ke Atas
+        const scrollTopBtn = document.getElementById('scrollTopBtn');
+        if (scrollTopBtn) {
+            window.addEventListener('scroll', function() {
+                if (window.scrollY > 300) { 
+                    scrollTopBtn.classList.add('show'); 
+                } else { 
+                    scrollTopBtn.classList.remove('show'); 
+                }
+            });
+
+            scrollTopBtn.addEventListener('click', function() {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        }
+
+        // ======= 3. KONEKSI KE FIREBASE UNTUK PRODUK BEST SELLER =======
+        const bSellerContainer = document.getElementById('best-seller-container') || document.getElementById('sliderCardContainer');
         let bestSellerProducts = [];
-        let indeksSekarang = 0;
-        let sliderInterval;
 
-        function initBestSellerSlider() {
-            const cardContainer = document.getElementById('sliderCardContainer');
-            if (!cardContainer) return;
+        // Format rupiah agar aman di HP
+        function formatRupiahHP(angka) {
+            if (angka === undefined || angka === null || isNaN(angka)) {
+                return "0";
+            }
+            return angka.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        }
 
-            if (bestSellerProducts.length === 0) {
-                cardContainer.innerHTML = `<p style="text-align:center; color:#888;">Belum ada produk Best Seller yang dimasukkan.</p>`;
+        // Ambil data menu otomatis dari Firebase
+        database.ref('katalog_menu').on('value', (snapshot) => {
+            if (!bSellerContainer) return; // Mencegah error jika element container tidak ada
+            
+            bSellerContainer.innerHTML = "";
+            const data = snapshot.val();
+            bestSellerProducts = [];
+            
+            if (!data) {
+                bSellerContainer.innerHTML = `<p class="text-gray-400 italic text-sm py-4" style="text-align:center; color:#888;">Belum ada menu Best Seller yang dipasang.</p>`;
                 return;
             }
 
-            renderKartuSatuSaja();
-            
-            if(sliderInterval) clearInterval(sliderInterval);
-            sliderInterval = setInterval(gantiKueOtomatis, 4000);
-        }
+            Object.keys(data).forEach((key) => {
+                const item = data[key];
+                const namaAman = item.nama ? item.nama : "Roti Spesial";
+                const hargaAman = item.harga ? item.harga : 0;
+                const gambarAman = item.image ? item.image : "toko.jpeg";
 
-        function renderKartuSatuSaja() {
-            const cardContainer = document.getElementById('sliderCardContainer');
-            if (!cardContainer) return;
+                bestSellerProducts.push({
+                    name: namaAman,
+                    price: hargaAman,
+                    image: gambarAman
+                });
 
-            const item = bestSellerProducts[indeksSekarang];
-            let hargaTampilan = `<p class="product-price">Rp ${parseInt(item.price).toLocaleString('id-ID')}</p>`;
-            
-            // Validasi keberadaan link gambar dari Firebase Storage
-            const tautanGambar = item.image ? item.image : 'toko.jpeg';
-            
-            cardContainer.innerHTML = `
-                <span class="badge-laris">Best Seller</span>
-                <span class="slider-number" style="position: absolute; top: 15px; right: 15px; background: rgba(0,0,0,0.5); color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: 500;">${indeksSekarang + 1}/${bestSellerProducts.length}</span>
-                <img src="${tautanGambar}" alt="${item.name}" class="product-img">
-                <div class="product-info">
-                    <h3>${item.name}</h3>
-                    ${hargaTampilan}
-                    <p class="product-desc">${item.desc || 'Tidak ada deskripsi.'}</p>
-                    
-                    <div class="shopee-actions">
-                        <button class="btn-icon btn-chat" onclick="window.open('https://wa.me/6281292330422?text=Halo%20Admin%20Mawar%20Sari,%20saya%20ingin%20tanya%20tentang%20kue%20${encodeURIComponent(item.name)}', '_blank')" title="Chat Admin">
-                            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12c0 2.02.6 3.9 1.63 5.48L2.05 22l4.7-.93C8.16 21.65 9.99 22 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm1 14h-2v-2h2v2zm0-4h-2V7h2v5z"/></svg>
-                        </button>
-                        <button class="btn-icon btn-cart" onclick="alert('Berhasil menambahkan 1 Pcs ${item.name} ke keranjang!')" title="Tambah ke Keranjang">
-                            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
-                        </button>
-                        <button class="btn-checkout" onclick="prosesBeli('${item.name}')">Beli Sekarang</button>
+                // Buat card produk yang fleksibel & estetik
+                const card = document.createElement('div');
+                card.className = "min-w-[220px] w-[220px] bg-white rounded-3xl shadow-[0_4px_15px_rgba(0,0,0,0.04)] border border-gray-100 p-4 flex flex-col gap-3 flex-shrink-0 text-left";
+                
+                card.innerHTML = `
+                    <div class="w-full h-36 rounded-2xl overflow-hidden bg-gray-100">
+                        <img src="${gambarAman}" alt="${namaAman}" class="w-full h-full object-cover">
                     </div>
-                </div>
-            `;
-        }
+                    <div class="space-y-1">
+                        <h3 class="font-bold text-gray-900 text-base truncate">${namaAman}</h3>
+                        <p class="text-[#E48227] font-extrabold text-base">Rp ${formatRupiahHP(hargaAman)}</p>
+                    </div>
+                    <button onclick="prosesBeli('${namaAman.replace(/'/g, "\\'")}')" class="w-full bg-[#E48227] hover:bg-[#d2731e] text-white text-xs font-bold py-3 rounded-xl transition mt-1">
+                        Beli Sekarang
+                    </button>
+                `;
+                bSellerContainer.appendChild(card);
+            });
+        });
 
-        function gantiKueOtomatis() {
-            if (bestSellerProducts.length === 0) return;
-            indeksSekarang = (indeksSekarang + 1) % bestSellerProducts.length;
-            const cardContainer = document.getElementById('sliderCardContainer');
-            if (cardContainer) {
-                cardContainer.style.opacity = '0';
-                setTimeout(() => {
-                    renderKartuSatuSaja();
-                    cardContainer.style.opacity = '1';
-                }, 300);
-            }
-        }
-        
+        // ======= 4. PROSES KIRIM DATA PRODUK KE CHECKOUT =======
         function prosesBeli(namaKue) {
             const produkDipilih = bestSellerProducts.find(item => item.name === namaKue);
-            const dataCheckout = {
-                name: produkDipilih.name,
-                price: produkDipilih.price,
-                image: produkDipilih.image || 'toko.jpeg'
-            };
-            localStorage.setItem('produk_checkout', JSON.stringify(dataCheckout));
-            window.location.href = 'checkout.html';
-        }
-
-        // Tangkap event database live dari server
-        database.ref('katalog_menu').on('value', function(snapshot) {
-            bestSellerProducts = [];
-            if (snapshot.exists()) {
-                snapshot.forEach((childSnapshot) => {
-                    const item = childSnapshot.val();
-                    if (item.kategori === 'best_seller') {
-                        bestSellerProducts.push(item);
-                    }
-                });
+            
+            if (produkDipilih) {
+                const dataCheckout = {
+                    name: produkDipilih.name,
+                    price: produkDipilih.price,
+                    image: produkDipilih.image
+                };
+                
+                // Simpan data ke localStorage agar otomatis terbaca di checkout.html
+                localStorage.setItem('produk_checkout', JSON.stringify(dataCheckout));
+                window.location.href = 'checkout.html';
+            } else {
+                alert("Produk tidak ditemukan, silakan muat ulang halaman.");
             }
-            indeksSekarang = 0;
-            initBestSellerSlider();
-        });
-
-        window.addEventListener('scroll', function () {
-            const navbar = document.querySelector('.navbar');
-            if (window.scrollY > 30) { navbar.classList.add('scrolled'); } 
-            else { navbar.classList.remove('scrolled'); }
-        });
-
-        const menuToggle = document.getElementById("menu-toggle");
-        const navLinks = document.getElementById("nav-links");
-        menuToggle.addEventListener("click", function(){ navLinks.classList.toggle("active"); });
-
-        AOS.init({ once: true });
-
-        window.addEventListener('load', function() {
-            const loader = document.getElementById('loader');
-            loader.style.opacity = '0';
-            setTimeout(() => { loader.style.display = 'none'; }, 500);
-        });
-
-        const scrollTopBtn = document.getElementById('scrollTopBtn');
-        window.addEventListener('scroll', function() {
-            if (window.scrollY > 300) { scrollTopBtn.classList.add('show'); } 
-            else { scrollTopBtn.classList.remove('show'); }
-        });
-        scrollTopBtn.addEventListener('click', function() { window.scrollTo({ top: 0, behavior: 'smooth' }); });
+        }
     </script>
 </body>
 </html>

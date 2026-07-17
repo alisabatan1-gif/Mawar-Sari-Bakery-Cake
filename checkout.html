@@ -3,177 +3,179 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Checkout Pemesanan - Mawar Sari</title>
-    <style>
-        body { font-family: Arial, sans-serif; background-color: #f5f5f5; margin: 0; padding: 20px; }
-        .checkout-container { max-width: 500px; margin: 20px auto; background: #fff; padding: 25px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        .product-summary { display: flex; align-items: center; gap: 15px; background: #f9f9f9; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 5px solid #e67e22; }
-        .product-summary img { width: 80px; height: 80px; object-fit: cover; border-radius: 5px; }
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; }
-        .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; font-size: 14px; }
-        .maps-hint { background-color: #e8f4fd; border: 1px solid #b3d7ff; padding: 10px; border-radius: 5px; font-size: 13px; color: #1d6fa5; margin-bottom: 10px; }
-        .btn-open-maps { background-color: #4285F4; color: white; border: none; padding: 8px 12px; font-size: 12px; border-radius: 4px; cursor: pointer; font-weight: bold; margin-top: 5px; display: inline-block; text-decoration: none; }
-        .btn-open-maps:hover { background-color: #357ae8; }
-        .total-pay { font-size: 1.2rem; font-weight: bold; color: #e67e22; margin: 20px 0; text-align: right; }
-        .btn-order { background-color: #25d366; color: white; border: none; padding: 12px; width: 100%; font-size: 16px; font-weight: bold; border-radius: 5px; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; }
-        .btn-order:hover { background-color: #128c7e; }
-        .btn-back { display: block; text-align: center; margin-top: 15px; color: #888; text-decoration: none; font-size: 14px; }
-    </style>
+    <title>Detail Pemesanan - Mawar Sari Bakery</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 </head>
-<body>
+<body class="bg-gray-50 font-sans antialiased text-gray-800">
 
-<div class="checkout-container">
-    <h2>Detail Pemesanan</h2>
-    
-    <!-- Informasi Produk Yang Dibeli -->
-    <div class="product-summary" id="productSummary">
-        <!-- Diisi otomatis oleh JS -->
+    <div class="max-w-md mx-auto px-4 py-8">
+        <div class="bg-white rounded-3xl shadow-md border border-gray-100 p-6 space-y-6">
+            
+            <h1 class="text-2xl font-bold text-gray-900">Detail Pemesanan</h1>
+
+            <!-- Preview Ringkasan Kue yang Dipilih -->
+            <div class="flex items-center gap-4 bg-gray-50 p-3 rounded-2xl border-l-4 border-[#E48227]">
+                <div class="w-20 h-20 rounded-xl overflow-hidden bg-gray-200 flex-shrink-0">
+                    <img id="preview-gambar" src="toko.jpeg" alt="Preview" class="w-full h-full object-cover">
+                </div>
+                <div>
+                    <!-- Nama Kue -->
+                    <h2 id="preview-nama" class="text-lg font-bold text-gray-900">Memuat nama...</h2>
+                    <!-- Harga Kue -->
+                    <p id="preview-harga" class="text-[#E48227] font-extrabold text-base">Rp 0</p>
+                </div>
+            </div>
+
+            <!-- Form Isian Pembeli -->
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-bold text-gray-900 mb-1">Nama Penerima:</label>
+                    <input type="text" id="nama-penerima" placeholder="Contoh: Budi Santoso" class="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 outline-none">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-bold text-gray-900 mb-1">Nomor WhatsApp/HP:</label>
+                    <input type="tel" id="nomor-wa" placeholder="Contoh: 08123456789" class="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 outline-none">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-bold text-gray-900 mb-1">Jumlah (Pcs):</label>
+                    <input type="number" id="jumlah-pcs" value="1" min="1" class="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 outline-none">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-bold text-gray-900 mb-1">Metode Pengiriman:</label>
+                    <select id="metode-kirim" class="w-full p-3 border border-gray-300 rounded-xl bg-gray-50 focus:ring-2 focus:ring-red-500 outline-none">
+                        <option value="Ambil Sendiri di Toko (Gratis)">Ambil Sendiri di Toko (Gratis)</option>
+                        <option value="Kirim Kurir (Ongkir Menyesuaikan)">Kirim Kurir (Ongkir Menyesuaikan)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Total Bayar -->
+            <div class="text-right pt-2">
+                <p class="text-xl font-extrabold text-[#E48227]">
+                    Total Bayar: <span id="total-bayar">Rp 0</span>
+                </p>
+            </div>
+
+            <!-- Tombol Kirim Pesanan Hijau -->
+            <div>
+                <button id="btn-kirim" class="w-full bg-[#2ECC71] hover:bg-[#27ae60] text-white font-bold py-4 px-4 rounded-2xl shadow-sm transition flex justify-center items-center gap-2 text-base">
+                    💬 Kirim Pesanan via WhatsApp
+                </button>
+            </div>
+
+        </div>
     </div>
 
-    <!-- Form Alamat Pengiriman -->
-    <form id="checkoutForm">
-        <div class="form-group">
-            <label for="buyerName">Nama Penerima:</label>
-            <input type="text" id="buyerName" required placeholder="Contoh: Budi Santoso">
-        </div>
-        <div class="form-group">
-            <label for="buyerPhone">Nomor WhatsApp/HP:</label>
-            <input type="tel" id="buyerPhone" required placeholder="Contoh: 08123456789">
-        </div>
-        <div class="form-group">
-            <label for="buyerQty">Jumlah (Pcs):</label>
-            <input type="number" id="buyerQty" value="1" min="1" required oninput="calculateTotal()">
-        </div>
-        <div class="form-group">
-            <label for="deliveryMethod">Metode Pengiriman:</label>
-            <select id="deliveryMethod" onchange="toggleDeliveryFields()">
-                <option value="Ambil Sendiri">Ambil Sendiri di Toko (Gratis)</option>
-                <option value="Kurir Toko">Kurir Mawar Sari (+Rp 10.000)</option>
-            </select>
-        </div>
+    <!-- SCRIPT UTK MEMPROSES DATA URL, LOCALSTORAGE & MEMBUAT LINK WA -->
+    <script>
+        // ======= 0. KONFIGURASI UTAMA TOKO (MUDAH DIUBAH PEMBELI WEB) =======
+        const NOMOR_WHATSAPP_TOKO = "6285210214849"; // Ganti ke nomor pembeli website Anda nanti
 
-        <!-- SEKSI BAGIAN GOOGLE MAPS & ALAMAT (Akan muncul jika pilih Kurir Toko) -->
-        <div id="deliveryAddressSection" style="display: none; background: #fafafa; padding: 15px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 15px;">
-            <div class="form-group">
-                <label for="buyerAddress">Alamat Lengkap Rumah:</label>
-                <textarea id="buyerAddress" rows="2" placeholder="Nama jalan, nomor rumah, RT/RW, warna pagar..."></textarea>
-            </div>
-            <div class="form-group">
-                <label for="buyerMaps">Link Lokasi Google Maps:</label>
-                <div class="maps-hint">
-                    📍 <strong>Tips:</strong> Buka Google Maps, cari rumah Anda, klik <strong>Bagikan / Share</strong>, lalu pilih <strong>Salin Link / Copy Link</strong> dan tempelkan di bawah ini.
-                    <br>
-                    <a href="https://www.google.com/maps" target="_blank" class="btn-open-maps">🗺️ Buka Google Maps</a>
-                </div>
-                <input type="text" id="buyerMaps" placeholder="Tempel link Google Maps di sini (https://maps.app.goo.gl/...)">
-            </div>
-        </div>
+        // ======= 1. AMBIL PARAMETER KUE DARI URL ATAU LOCALSTORAGE =======
+        const urlParams = new URLSearchParams(window.location.search);
+        let namaKue = urlParams.get('nama');
+        let hargaKue = parseInt(urlParams.get('harga'));
+        let gambarKue = urlParams.get('image');
 
-        <div class="total-pay" id="totalPayment">Total Bayar: Rp 0</div>
-
-        <button type="submit" class="btn-order">
-            💬 Kirim Pesanan via WhatsApp
-        </button>
-    </form>
-    
-    <a href="index.html" class="btn-back">⬅️ Kembali ke Toko</a>
-</div>
-
-<script>
-    const product = JSON.parse(localStorage.getItem('produk_checkout'));
-
-    if (!product) {
-        alert("Keranjang belanja kosong! Silakan pilih produk terlebih dahulu.");
-        window.location.href = "index.html";
-    }
-
-    // Render Ringkasan Produk
-    const productSummary = document.getElementById('productSummary');
-    productSummary.innerHTML = `
-        <img src="${product.image}" alt="${product.name}">
-        <div>
-            <h3 style="margin: 0; font-size: 16px;">${product.name}</h3>
-            <p style="margin: 5px 0 0; color: #e67e22; font-weight: bold;">Rp ${parseInt(product.price).toLocaleString('id-ID')}</p>
-        </div>
-    `;
-
-    function toggleDeliveryFields() {
-        const delivery = document.getElementById('deliveryMethod').value;
-        const addressSection = document.getElementById('deliveryAddressSection');
-        const addressInput = document.getElementById('buyerAddress');
-        const mapsInput = document.getElementById('buyerMaps');
-        
-        if (delivery === "Kurir Toko") {
-            addressSection.style.display = "block";
-            addressInput.setAttribute('required', 'required');
-            mapsInput.setAttribute('required', 'required'); // SEKARANG WAJIB DIISI JIKA DIKIRIM KURIR
-        } else {
-            addressSection.style.display = "none";
-            addressInput.removeAttribute('required');
-            mapsInput.removeAttribute('required');
-        }
-        calculateTotal();
-    }
-
-    // FUNGSI UTAMA HITUNG TOTAL DENGAN VALIDASI INPUT MINUS/KOSONG
-    function calculateTotal() {
-        let qtyInput = document.getElementById('buyerQty');
-        let qty = parseInt(qtyInput.value);
-        
-        if (isNaN(qty) || qty < 1) {
-            qty = 1;
-            qtyInput.value = 1;
-        }
-        
-        const delivery = document.getElementById('deliveryMethod').value;
-        const shippingCost = (delivery === "Kurir Toko") ? 10000 : 0;
-        
-        const total = (product.price * qty) + shippingCost;
-        document.getElementById('totalPayment').innerText = `Total Bayar: Rp ${total.toLocaleString('id-ID')}`;
-        return total;
-    }
-
-    // Inisialisasi total pertama kali
-    calculateTotal();
-
-    document.getElementById('checkoutForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const name = document.getElementById('buyerName').value;
-        const phone = document.getElementById('buyerPhone').value;
-        const qty = document.getElementById('buyerQty').value;
-        const delivery = document.getElementById('deliveryMethod').value;
-        const totalBayar = calculateTotal();
-
-        let address = "";
-        let mapsUrl = "";
-
-        if (delivery === "Ambil Sendiri") {
-            address = "Toko Mawar Sari Bakery, Jl. Raya Utama No.45 (Depan Alun-Alun)";
-            mapsUrl = "https://maps.google.com/?q=Mawar+Sari+Bakery"; 
-        } else {
-            address = document.getElementById('buyerAddress').value;
-            mapsUrl = document.getElementById('buyerMaps').value;
+        // Jika di URL kosong, coba ambil dari localStorage (dari halaman utama index.html)
+        if (!namaKue) {
+            const dataLokal = localStorage.getItem('produk_checkout');
+            if (dataLokal) {
+                try {
+                    const parsedData = JSON.parse(dataLokal);
+                    namaKue = parsedData.name || "Kue Pilihan";
+                    hargaKue = parseInt(parsedData.price) || 0;
+                    gambarKue = parsedData.image || "toko.jpeg";
+                } catch (e) {
+                    console.error("Gagal membaca localStorage", e);
+                }
+            }
         }
 
-        // Format pesan WhatsApp yang dikirim
-        const waText = `*PESANAN BARU - MAWAR SARI BAKERY*\n\n` +
-                       `*Produk:* ${product.name}\n` +
-                       `*Harga Satuan:* Rp ${parseInt(product.price).toLocaleString('id-ID')}\n` +
-                       `*Jumlah:* ${qty} Pcs\n` +
-                       `----------------------------------\n` +
-                       `*Nama Pembeli:* ${name}\n` +
-                       `*No. HP:* ${phone}\n` +
-                       `*Metode:* ${delivery}\n` +
-                       `*Alamat Lokasi:* ${address}\n` +
-                       `*Link Peta:* ${mapsUrl}\n` +
-                       `----------------------------------\n` +
-                       `*TOTAL BAYAR:* *Rp ${totalBayar.toLocaleString('id-ID')}*`;
+        // Default jika semuanya kosong
+        namaKue = namaKue || "Kue Pilihan";
+        hargaKue = hargaKue || 0;
+        gambarKue = gambarKue || "toko.jpeg";
 
-        const waUrl = `https://wa.me/6281292330422?text=${encodeURIComponent(waText)}`;
-        window.open(waUrl, '_blank');
-    });
-</script>
+        // Element DOM
+        const previewGambar = document.getElementById('preview-gambar');
+        const previewNama = document.getElementById('preview-nama');
+        const previewHarga = document.getElementById('preview-harga');
+        const inputJumlah = document.getElementById('jumlah-pcs');
+        const txtTotalBayar = document.getElementById('total-bayar');
+        const selectMetode = document.getElementById('metode-kirim');
+        const btnKirim = document.getElementById('btn-kirim');
+
+        // Taruh data ke tampilan atas
+        previewGambar.src = gambarKue;
+        previewNama.innerText = namaKue;
+        
+        // ======= 2. FUNGSI RUPIAH ANTI-ERROR DI HP =======
+        function formatRupiahHP(angka) {
+            if (angka === undefined || angka === null || isNaN(angka)) {
+                return "0";
+            }
+            return angka.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        }
+
+        previewHarga.innerText = "Rp " + formatRupiahHP(hargaKue);
+
+        // ======= 3. HITUNG TOTAL BAYAR SECARA REALTIME =======
+        function hitungTotal() {
+            const qty = parseInt(inputJumlah.value) || 1;
+            const total = hargaKue * qty;
+            txtTotalBayar.innerText = "Rp " + formatRupiahHP(total);
+        }
+
+        // Jalankan hitungan pertama kali & tiap kali jumlah diubah
+        hitungTotal();
+        inputJumlah.addEventListener('input', hitungTotal);
+        inputJumlah.addEventListener('change', hitungTotal);
+
+        // ======= 4. PROSES KIRIM DATA KE WHATSAPP TOKO =======
+        btnKirim.addEventListener('click', () => {
+            const penerima = document.getElementById('nama-penerima').value.trim();
+            const waPembeli = document.getElementById('nomor-wa').value.trim();
+            const qty = inputJumlah.value;
+            const metode = selectMetode.value;
+            const totalBayar = hargaKue * qty;
+
+            // Validasi inputan agar wajib diisi dahulu
+            if (!penerima) {
+                alert("Harap isi Nama Penerima terlebih dahulu!");
+                return;
+            }
+            if (!waPembeli) {
+                alert("Harap isi Nomor WhatsApp Anda!");
+                return;
+            }
+
+            // Menyusun format pesan WhatsApp yang rapi
+            const teksPesan = `Halo Mawar Sari Bakery, saya ingin melakukan pemesanan kue:
+
+*DETAIL PESANAN*
+* Nama Kue: ${namaKue}
+* Harga Satuan: Rp ${formatRupiahHP(hargaKue)}
+* Jumlah (Pcs): ${qty} buah
+* Total Bayar: Rp ${formatRupiahHP(totalBayar)}
+
+*DATA PENERIMA*
+* Nama: ${penerima}
+* No. HP: ${waPembeli}
+* Metode Pengiriman: ${metode}
+
+Mohon segera diproses ya, terima kasih!`;
+
+            // Buka WhatsApp pembeli
+            const linkWhatsApp = `https://wa.me/${NOMOR_WHATSAPP_TOKO}?text=${encodeURIComponent(teksPesan)}`;
+            window.open(linkWhatsApp, '_blank');
+        });
+    </script>
 </body>
 </html>
