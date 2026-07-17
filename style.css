@@ -1,8 +1,9 @@
---- CSS RESET & DASAR --- * {
+/* --- CSS RESET & DASAR --- */
+* {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: "Inter, Segoe UI, Tahoma, 'geneva', Verdana, sans-serif";
+    font-family: "Inter", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
     scroll-behavior: smooth;
 }
 
@@ -16,9 +17,7 @@ body {
     overflow-x: hidden;
 }
 
-/* ==========================================================================
-   --- NAVIGATION BAR (SEBELUM DI-SCROLL / DI PALING ATAS) ---
-   ========================================================================== */
+/* --- NAVIGATION BAR --- */
 .navbar {
     background-color: transparent;
     padding: 20px 5%;
@@ -28,7 +27,6 @@ body {
     position: fixed;
     width: 100%;
     top: 0;
-    box-shadow: none;
     z-index: 1000;
     transition: background-color 0.35s ease, box-shadow 0.35s ease, padding 0.35s ease;
 }
@@ -45,7 +43,6 @@ body {
     font-size: 30px;
     color: #ffffff;
     cursor: pointer;
-    transition: color 0.35s ease;
 }
 
 .nav-links { 
@@ -68,9 +65,7 @@ body {
     color: #e67e22; 
 }
 
-/* ==========================================================================
-   --- NAVIGATION BAR (SETELAH DI-SCROLL KE BAWAH) ---
-   ========================================================================== */
+/* NAVBAR SCROLLED */
 .navbar.scrolled {
     background-color: rgba(255, 255, 255, 0.92) !important;
     backdrop-filter: blur(12px); 
@@ -79,14 +74,8 @@ body {
     padding: 12px 5%; 
 }
 
-.navbar.scrolled .logo { 
-    color: #2c1d11 !important; 
-}
-
-.navbar.scrolled .menu-toggle {
-    color: #2c1d11 !important;
-}
-
+.navbar.scrolled .logo,
+.navbar.scrolled .menu-toggle,
 .navbar.scrolled .nav-links a { 
     color: #2c1d11 !important; 
 }
@@ -97,8 +86,7 @@ body {
 
 /* --- HERO SECTION --- */
 .hero-section {
-    background-color: #fcfaf2;
-    background-image: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.75) 100%), url(toko.jpeg);
+    background-image: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.75) 100%), url('toko.jpeg');
     background-repeat: no-repeat;
     background-position: center center;
     background-size: cover;
@@ -109,7 +97,6 @@ body {
     text-align: center;
     color: white;
     padding: 0 20px;
-    margin-top: 0;
     width: 100%;
 }
 
@@ -139,8 +126,6 @@ body {
 }
 
 .hero-content p {
-    font-family: 'Inter', sans-serif;
-    font-weight: 400;
     font-size: 1.3rem;
     line-height: 1.8;
     margin-bottom: 40px;
@@ -148,7 +133,7 @@ body {
     text-shadow: 1px 1px 4px rgba(0,0,0,0.5);
 }
 
-/* --- TOMBOL-TOMBOL --- */
+/* --- TOMBOL --- */
 .btn-primary {
     display: inline-block;
     background-color: transparent;
@@ -159,9 +144,9 @@ body {
     border-radius: 30px;
     font-weight: bold;
     font-size: 1.1rem;
-    letter-spacing: 0.5px;
     transition: all 0.35s ease;
 }
+
 .btn-primary:hover {
     background-color: #d35400;
     border-color: #d35400;
@@ -169,53 +154,21 @@ body {
     transform: translateY(-3px);
 }
 
-.btn-whatsapp {
-    display: inline-block;
-    background-color: #25d366;
-    color: white;
-    padding: 15px 35px;
-    text-decoration: none;
-    border-radius: 30px;
-    font-weight: bold;
-    font-size: 18px;
-    margin-top: 20px;
-    box-shadow: 0 8px 20px rgba(37,211,102,0.3);
-    transition: all 0.3s ease;
-}
-.btn-whatsapp:hover {
-    background-color: #20ba5a;
-    transform: translateY(-3px);
-    box-shadow: 0 12px 28px rgba(37,211,102,0.4);
+/* --- SECTION & GRID --- */
+.section-container { 
+    padding: 80px 10%; 
+    text-align: center; 
+    width: 100%; 
 }
 
-/* --- GRID & SECTION --- */
-.section-container { padding: 80px 10%; text-align: center; width: 100%; box-sizing: border-box; }
-.bg-light { background-color: #fdf8f2; }
-
-.section-container h2,
-.section-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 2.2rem;
-    color: #2c2c2c;
-    margin-bottom: 15px;
-    position: relative;
-}
-.section-container h2::after,
-.section-title::after {
-    content: '';
-    display: block;
-    width: 50px;
-    height: 3px;
-    background: #d35400;
-    margin: 15px auto 0 auto;
-}
-.section-subtitle {
-    color: #888;
-    font-size: 1rem;
-    margin-bottom: 40px;
+.grid-features { 
+    display: flex; 
+    justify-content: center; 
+    gap: 30px; 
+    flex-wrap: wrap; 
+    margin-top: 40px; 
 }
 
-.grid-features { display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; margin-top: 40px; }
 .feature-card {
     background: white;
     padding: 30px;
@@ -223,25 +176,23 @@ body {
     width: 280px;
     text-align: left;
     border: 1px solid #f2e6da;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.02);
-    transition: 0.3s;
-}
-.feature-card:hover { transform: translateY(-8px); box-shadow: 0 12px 30px rgba(211,84,0,0.12); }
-.feature-card h3 {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.15rem;
-    margin-bottom: 10px;
-    color: #d35400;
-}
-.feature-card p {
-    color: #777;
-    font-size: 0.92rem;
-    line-height: 1.7;
 }
 
-/* --- KARTU PRODUK & SHOPEE STYLE --- */
-.product-section { padding: 60px 20px; background-color: #fcfcfc; text-align: center; width: 100%; box-sizing: border-box; }
-.product-grid { display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; max-width: 1100px; margin: 0 auto; }
+.product-section { 
+    padding: 80px 20px; 
+    background-color: #fcfcfc; 
+    text-align: center; 
+    width: 100%; 
+}
+
+.product-grid { 
+    display: flex; 
+    justify-content: center; 
+    gap: 30px; 
+    flex-wrap: wrap; 
+    max-width: 1100px; 
+    margin: 0 auto; 
+}
 
 .product-card {
     background: white;
@@ -249,51 +200,8 @@ body {
     box-shadow: 0 10px 30px rgba(0,0,0,0.06);
     width: 300px;
     overflow: hidden;
-    position: relative;
     text-align: left;
-    transition: 0.3s;
 }
-.product-card:hover {
-    box-shadow: 0 15px 35px rgba(211,84,0,0.15);
-    transform: translateY(-6px);
-}
-.badge-laris {
-    position: absolute; top: 15px; left: 15px; background: #e74c3c; color: white;
-    padding: 5px 10px; font-size: 0.8rem; font-weight: bold; border-radius: 20px;
-}
-.product-img { width: 100%; height: 220px; object-fit: cover; }
-.product-info { padding: 20px; }
-.product-info h3 {
-    font-family: 'Playfair Display', serif;
-    margin-bottom: 8px;
-    font-size: 1.2rem;
-}
-.product-desc { font-size: 0.85rem; color: #666; height: 50px; overflow: hidden; margin-bottom: 10px; }
-.product-price {
-    font-family: 'Inter', sans-serif;
-    font-size: 1.2rem;
-    font-weight: bold;
-    color: #d35400;
-    margin-bottom: 15px;
-}
-
-/* --- STYLE TOMBOL SHOPEE --- */
-.shopee-actions { display: flex; align-items: center; gap: 8px; border-top: 1px solid #f2f2f2; padding-top: 15px; }
-
-.btn-icon {
-    display: flex; align-items: center; justify-content: center;
-    width: 44px; height: 44px; background-color: #fff5f0;
-    border: 1px solid #e67e22; color: #e67e22;
-    border-radius: 8px; cursor: pointer; transition: 0.2s;
-}
-.btn-icon:hover { background-color: #fdece2; transform: translateY(-2px); }
-
-.btn-checkout {
-    flex: 1; height: 44px; background-color: #e67e22; color: white;
-    border: none; border-radius: 8px; font-size: 0.95rem; font-weight: bold;
-    cursor: pointer; transition: 0.2s;
-}
-.btn-checkout:hover { background-color: #d35400; transform: translateY(-2px); }
 
 /* --- FOOTER --- */
 .footer-section {
@@ -301,316 +209,13 @@ body {
     color: white;
     padding: 60px 20px;
     text-align: center;
-    position: relative;
     width: 100%;
-    box-sizing: border-box;
-}
-.footer-section h2 {
-    font-family: 'Playfair Display', serif;
-    font-size: 2rem;
-    margin-bottom: 15px;
-}
-.footer-section p {
-    color: #cfd8dc;
-    max-width: 500px;
-    margin: 0 auto 15px auto;
-}
-.copyright { margin-top: 40px; font-size: 12px; color: #7f8c8d; }
-.see-all-container { margin-top: 50px; }
-.btn-secondary {
-    display: inline-block; background: #2c3e50; color: white;
-    padding: 12px 25px; border-radius: 25px; text-decoration: none; font-weight: bold;
-    transition: 0.3s;
-}
-.btn-secondary:hover { background: #1a252f; transform: translateY(-2px); }
-
-/* ============================================= */
-/* ===== UPGRADE SECTION "PRODUK BEST SELLER" === */
-/* ============================================= */
-
-.product-section {
-    padding: 100px 20px;
-    background: linear-gradient(180deg, #fcfcfc 0%, #fdf8f2 100%);
 }
 
-.see-all-container {
-    margin-top: 50px;
-    padding-top: 30px;
-    border-top: 1px solid #f0e0cf;
-}
-
-.see-all-container p {
-    color: #888;
-    margin-bottom: 15px;
-    font-size: 0.95rem;
-}
-
-.btn-secondary {
-    background: transparent;
-    border: 2px solid #2c3e50;
-    color: #2c3e50;
-    padding: 12px 28px;
-    letter-spacing: 0.3px;
-    transition: all 0.3s ease;
-}
-.btn-secondary:hover {
-    background: #2c3e50;
-    color: white;
-    box-shadow: 0 10px 25px rgba(44,62,80,0.25);
-    transform: translateY(-3px);
-}
-
-.slider-number {
-    backdrop-filter: blur(4px);
-}
-
-.badge-laris {
-    box-shadow: 0 4px 12px rgba(231,76,60,0.35);
-    letter-spacing: 0.3px;
-}
-
-/* ============================================= */
-/* ===== UPGRADE FOOTER — LEBIH MEWAH =========== */
-/* ============================================= */
-
-.footer-section {
-    padding: 90px 20px 50px 20px;
-    position: relative;
-    overflow: hidden;
-}
-
-.footer-section::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 80px;
-    height: 3px;
-    background: #d35400;
-}
-
-.footer-section h2 {
-    letter-spacing: 0.5px;
-}
-
-.footer-section p {
-    line-height: 1.7;
-}
-
-.footer-section .copyright {
-    border-top: 1px solid rgba(255,255,255,0.08);
-    padding-top: 25px;
-    margin-top: 45px;
-    letter-spacing: 0.3px;
-}
-
-/* ============================================= */
-/* ===== FITUR INTERAKTIF MODERN (MAMBA) ======= */
-/* ============================================= */
-
-#loader {
-    position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background-color: #fcfaf2;
-    z-index: 9999;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    transition: opacity 0.5s ease;
-}
-.spinner {
-    width: 50px; height: 50px;
-    border: 5px solid rgba(176, 130, 87, 0.2);
-    border-top-color: #d35400;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-}
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
-
-.floating-wa {
-    position: fixed;
-    bottom: 30px; right: 30px;
-    background-color: #25d366;
-    color: white;
-    width: 60px; height: 60px;
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 32px;
-    box-shadow: 0 8px 25px rgba(37, 211, 102, 0.4);
-    z-index: 999;
-    transition: all 0.3s ease;
-}
-.floating-wa:hover {
-    transform: scale(1.1) translateY(-5px);
-    background-color: #20ba5a;
-}
-
-#scrollTopBtn {
-    position: fixed;
-    bottom: 105px; right: 35px;
-    background-color: #b08257;
-    color: white;
-    border: none;
-    width: 45px; height: 45px;
-    border-radius: 50%;
-    font-size: 18px;
-    cursor: pointer;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    z-index: 998;
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.3s ease;
-}
-#scrollTopBtn.show {
-    opacity: 1;
-    visibility: visible;
-}
-#scrollTopBtn:hover {
-    background-color: #d35400;
-    transform: translateY(-3px);
-}
-
-/* ==========================================================================
-   --- MEDIA QUERY LAPTOP/KOMPUTER DESKTOP (Lebih dari 1024px) ---
-   ========================================================================== */
-@media screen and (min-width: 1024px) {
-    .hero-section {
-        height: 100vh !important;
-    }
-    .hero-content {
-        max-width: 1200px !important;
-        width: 90% !important;
-    }
-    .hero-content h1 {
-        font-size: 3.8rem !important;
-        margin-bottom: 25px;
-    }
-    .hero-content p {
-        font-size: 1.3rem !important;
-        max-width: 900px !important;
-        margin-left: auto !important;
-        margin-right: auto !important;
-        margin-bottom: 45px;
-    }
-    .btn-primary {
-        padding: 18px 55px !important;
-        font-size: 1.2rem !important;
-    }
-}
-
-/* ============================================= */
-/* ===== RESPONSIVE HP & PERBAIKAN TOTAL ======== */
-/* ============================================= */
+/* --- MEDIA QUERY RESPONSIF HP (Max 768px) --- */
 @media screen and (max-width: 768px) {
     .navbar {
-        flex-direction: column;
-        padding: 15px;
-    }
-
-    .logo {
-        margin-bottom: 10px;
-        font-size: 18px;
-        text-align: center;
-    }
-
-    .nav-links {
-        flex-direction: column;
-        align-items: center;
-        gap: 12px;
-        width: 100%;
-    }
-
-    .nav-links li {
-        margin-left: 0;
-    }
-
-    .hero-section {
-        height: auto;
-        padding: 140px 20px 80px;
-    }
-
-    .hero-content h1 {
-        font-size: 2.2rem !important;
-    }
-
-    .hero-content p {
-        font-size: 1rem !important;
-    }
-
-    .section-container {
-        padding: 60px 20px;
-    }
-
-    .grid-features {
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .feature-card {
-        width: 100%;
-        max-width: 350px;
-    }
-
-    .product-grid {
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .product-card {
-        width: 100%;
-        max-width: 350px;
-    }
-
-    .btn-primary,
-    .btn-secondary,
-    .btn-whatsapp {
-        width: 100%;
-        text-align: center;
-    }
-
-    .floating-wa {
-        width: 55px;
-        height: 55px;
-        font-size: 28px;
-        bottom: 20px;
-        right: 20px;
-    }
-
-    #scrollTopBtn {
-        bottom: 90px;
-        right: 25px;
-    }
-
-    img {
-        max-width: 100%;
-        height: auto;
-    }
-}
-
-.menu-toggle {
-    display: none;
-    font-size: 30px;
-    color: white;
-    cursor: pointer;
-}
-
-@media (max-width: 768px) {
-    .navbar {
-        display: flex;
-        flex-direction: row; 
-        justify-content: space-between;
-        align-items: center;
         padding: 15px 20px;
-    }
-
-    .logo {
-        font-size: 18px;
-        margin-bottom: 0;
     }
 
     .menu-toggle {
@@ -637,38 +242,22 @@ body {
         text-align: center;
     }
 
-    .navbar.scrolled .nav-links {
-        background: #fdf8f2 !important; 
-        box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1) !important;
-    }
-
-    .navbar.scrolled .nav-links a {
-        color: #2c1d11 !important;
-    }
-
-    .navbar.scrolled .nav-links a:hover {
-        color: #d35400 !important;
-    }
-
     .hero-section {
-        height: auto;
-        padding: 140px 20px 80px;
+        height: 100vh;
+        padding: 0 20px;
     }
 
     .hero-content h1 {
-        font-size: 2.2rem;
-        line-height: 1.2;
+        font-size: 2.2rem !important;
     }
 
     .hero-content p {
-        font-size: 1rem;
+        font-size: 1rem !important;
     }
 
-    .product-card {
-        width: 95%;
-    }
-
+    .product-card,
     .feature-card {
         width: 100%;
+        max-width: 350px;
     }
 }
