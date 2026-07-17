@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, minimum-scale=1.0">
     <title>Mawar Sari Bakery & Cake - Premium Quality</title>
     <link rel="stylesheet" href="style.css">
     
@@ -19,8 +19,12 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
-    <!-- STYLE TAMBAHAN NAVBAR & PAKSAAN UKURAN LAPTOP -->
+    <!-- STYLE TAMBAHAN NAVBAR & RESPONSIF LAPTOP/HP -->
     <style>
+        html, body {
+            width: 100%;
+            overflow-x: hidden;
+        }
         .navbar {
             position: fixed;
             top: 0;
@@ -58,17 +62,18 @@
                 padding: 0 5% !important;
             }
             .hero-content {
-                max-width: 950px !important;
+                max-width: 1100px !important;
+                width: 90% !important;
                 text-align: center !important;
                 margin: 0 auto !important;
             }
             .hero-content h1 {
-                font-size: 4rem !important;
+                font-size: 3.8rem !important;
                 line-height: 1.25 !important;
                 margin-bottom: 25px !important;
             }
             .hero-content p {
-                font-size: 1.4rem !important;
+                font-size: 1.3rem !important;
                 line-height: 1.6 !important;
                 margin-bottom: 40px !important;
                 max-width: 850px !important;
@@ -76,7 +81,7 @@
                 margin-right: auto !important;
             }
             .hero-content .btn-primary {
-                font-size: 1.2rem !important;
+                font-size: 1.1rem !important;
                 padding: 16px 50px !important;
                 border-radius: 35px !important;
                 display: inline-block !important;
@@ -128,7 +133,7 @@
 
     <!-- SECTION PRODUK BEST SELLER -->
     <section id="produk" class="product-section">
-        <div class="container">
+        <div class="container" style="width: 100%; max-width: 1200px; margin: 0 auto;">
             <h2 class="section-title">Produk Best Seller</h2>
             <p class="section-subtitle">Varian paling favorit yang paling sering diburu pelanggan setia kami.</p>
             
