@@ -1,399 +1,436 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
     <title>Mawar Sari Bakery & Cake - Premium Quality</title>
     
     <!-- GOOGLE FONTS -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&family=Playfair+Display:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
     <!-- FONT AWESOME -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
     <!-- AOS ANIMATION CSS -->
     <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
 
-    <!-- LOAD SDK FIREBASE V8 -->
+    <!-- TAILWIND CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        maroon: { 600: '#800020', 700: '#600018', 800: '#400010' },
+                        rose: { 600: '#E32636', 700: '#C41E3A' },
+                        gold: { 500: '#D4AF37', 600: '#AA8C2C', 400: '#F3E5AB' },
+                        cream: { 50: '#FDFBF7', 100: '#F4EFE6', 200: '#EADFCF' }
+                    },
+                    fontFamily: {
+                        playfair: ['Playfair Display', 'serif'],
+                        sans: ['Plus Jakarta Sans', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- LOAD SDK FIREBASE V8 (Mendukung fungsi asli) -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
-    <!-- STYLE RESPONSIF OTOMATIS (SUPAYA TIDAK BERANTAKAN DI HP/LAPTOP) -->
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
-            scroll-behavior: smooth;
-        }
-
-        html, body {
-            width: 100%;
-            overflow-x: hidden;
-            background-color: #faf9f6;
-            color: #333;
-        }
-
-        /* NAVIGATION BAR */
-        .navbar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            padding: 20px 5%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: transparent;
-            transition: all 0.3s ease;
-            z-index: 1000;
-        }
-
-        .navbar .logo {
-            font-weight: 700;
-            font-size: 20px;
-            color: #ffffff;
-            text-shadow: 1px 1px 3px rgba(0,0,0,0.6);
-        }
-
-        .nav-links {
-            display: flex;
-            list-style: none;
-            gap: 25px;
-        }
-
-        .nav-links a {
-            text-decoration: none;
-            color: #ffffff;
-            font-weight: 500;
-            text-shadow: 1px 1px 3px rgba(0,0,0,0.6);
-            transition: color 0.3s;
-        }
-
-        .nav-links a:hover {
-            color: #E48227;
-        }
-
-        .menu-toggle {
-            display: none;
-            font-size: 28px;
-            color: #ffffff;
-            cursor: pointer;
-        }
-
-        /* NAVBAR KETIKA DI-SCROLL */
-        .navbar.scrolled {
-            background-color: #ffffff !important;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-            padding: 15px 5%;
-        }
-
-        .navbar.scrolled .logo,
-        .navbar.scrolled .nav-links a,
-        .navbar.scrolled .menu-toggle {
-            color: #111827 !important;
-            text-shadow: none !important;
-        }
-
-        /* HERO SECTION */
-        .hero-section {
-            background-image: linear-gradient(180deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.7) 100%), url('toko.jpeg');
-            background-repeat: no-repeat;
-            background-position: center center;
-            background-size: cover;
-            height: 100vh;
-            min-height: 600px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 0 20px;
-        }
-
-        .hero-content {
-            max-width: 900px;
-            width: 100%;
-            z-index: 2;
-        }
-
-        .hero-content h1 {
-            font-family: 'Playfair Display', serif;
-            font-size: clamp(2.2rem, 5vw, 4rem);
-            color: #ffffff;
-            line-height: 1.2;
-            margin-bottom: 20px;
-            text-shadow: 2px 2px 8px rgba(0,0,0,0.7);
-        }
-
-        .hero-content p {
-            font-size: clamp(1rem, 2vw, 1.25rem);
-            color: #f3f4f6;
-            line-height: 1.6;
-            margin-bottom: 35px;
-            text-shadow: 1px 1px 4px rgba(0,0,0,0.6);
-        }
-
-        .btn-primary {
-            display: inline-block;
-            background-color: #E48227;
-            color: #ffffff;
-            padding: 14px 35px;
-            border-radius: 30px;
-            font-weight: 700;
-            text-decoration: none;
-            transition: background 0.3s, transform 0.2s;
-            box-shadow: 0 4px 15px rgba(228, 130, 39,.4);
-        }
-
-        .btn-primary:hover {
-            background-color: #d2731e;
-            transform: translateY(-2px);
-        }
-
-        /* SECTION TENTANG KAMI */
-        .section-container {
-            padding: 80px 8%;
-            text-align: center;
-            background-color: #ffffff;
-        }
-
-        .section-container h2 {
-            font-family: 'Playfair Display', serif;
-            font-size: clamp(1.8rem, 3vw, 2.5rem);
-            margin-bottom: 40px;
-            color: #1f2937;
-        }
-
-        .grid-features {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 25px;
-            max-width: 1100px;
-            margin: 0 auto;
-        }
-
-        .feature-card {
-            background: #fffdf9;
-            padding: 30px;
-            border-radius: 16px;
-            border: 1px solid #f3f4f6;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
-            text-align: left;
-        }
-
-        .feature-card h3 {
-            font-size: 1.15rem;
-            margin-bottom: 12px;
-            color: #B93C28;
-        }
-
-        .feature-card p {
-            font-size: 0.95rem;
-            color: #6b7280;
-            line-height: 1.6;
-        }
-
-        /* SECTION PRODUK BEST SELLER */
-        .product-section {
-            padding: 80px 8%;
-            background-color: #faf9f6;
-            text-align: center;
-        }
-
-        .section-title {
-            font-family: 'Playfair Display', serif;
-            font-size: clamp(1.8rem, 3vw, 2.5rem);
-            color: #1f2937;
-            margin-bottom: 10px;
-        }
-
-        .section-subtitle {
-            color: #6b7280;
-            margin-bottom: 40px;
-            font-size: 1rem;
-        }
-
-        #sliderCardContainer {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 25px;
-            max-width: 1100px;
-            margin: 0 auto;
-            justify-items: center;
-        }
-
-        .see-all-container {
-            margin-top: 50px;
-        }
-
-        .btn-secondary {
-            display: inline-block;
-            background-color: transparent;
-            color: #E48227;
-            border: 2px solid #E48227;
-            padding: 12px 30px;
-            border-radius: 25px;
-            font-weight: 700;
-            text-decoration: none;
-            margin-top: 15px;
-            transition: all 0.3s;
-        }
-
-        .btn-secondary:hover {
-            background-color: #E48227;
-            color: #fff;
-        }
-
-        /* FOOTER */
-        .footer-section {
-            background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
-            color: white;
-            padding: 60px 8%;
-            text-align: center;
-        }
-
-        .footer-section h2 {
-            font-family: 'Playfair Display', serif;
-            font-size: 2rem;
-            margin-bottom: 15px;
-        }
-
-        .footer-section p {
-            color: #9ca3af;
-            margin-bottom: 25px;
-        }
-
-        .btn-whatsapp {
-            display: inline-block;
-            background-color: #2ECC71;
-            color: white;
-            padding: 14px 30px;
-            border-radius: 30px;
-            font-weight: bold;
-            text-decoration: none;
-            box-shadow: 0 4px 15px rgba(46, 204, 113, 0.4);
-            transition: background 0.3s;
-        }
-
-        .btn-whatsapp:hover {
-            background-color: #27ae60;
-        }
-
-        .copyright {
-            margin-top: 40px;
-            font-size: 0.85rem;
-            color: #6b7280;
-        }
-
-        /* MEDIA QUERY HP (Responsive Menu Dropdown) */
-        @media screen and (max-width: 768px) {
-            .menu-toggle {
-                display: block;
-            }
-            .nav-links {
-                display: none;
-                flex-direction: column;
-                position: absolute;
-                top: 100%;
-                left: 0;
-                width: 100%;
-                background: #ffffff;
-                padding: 20px 0;
-                box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-                text-align: center;
-            }
-            .nav-links.active {
-                display: flex;
-            }
-            .nav-links a {
-                color: #111827 !important;
-                text-shadow: none !important;
-                font-size: 1.1rem;
-                padding: 10px 0;
-            }
-        }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #FDFBF7; color: #2C2C2C; overflow-x: hidden; }
+        h1, h2, h3, .font-playfair { font-family: 'Playfair Display', serif; }
+        .glass-nav { background: rgba(253, 251, 247, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
     </style>
 </head>
-<body>
+<body class="bg-cream-50 text-gray-800 antialiased selection:bg-gold-500 selection:text-white">
 
-    <!-- NAVIGATION BAR -->
-    <nav class="navbar" id="navbar">
-        <div class="logo">Mawar Sari Bakery & Cake</div>
-        <div class="menu-toggle" id="menu-toggle">☰</div>
-        <ul class="nav-links" id="nav-links">
-            <li><a href="#home">Home</a></li>
-            <li><a href="#tentang">Tentang Kami</a></li>
-            <li><a href="#produk">Produk</a></li>
-            <li><a href="#kontak">Hubungi Kami</a></li>
+    <!-- LOADING ANIMATION -->
+    <div id="loader" class="fixed inset-0 bg-cream-50 z-[9999] flex justify-center items-center transition-opacity duration-500">
+        <div class="w-12 h-12 border-4 border-gold-400 border-t-maroon-700 rounded-full animate-spin"></div>
+    </div>
+
+    <!-- NAVBAR PREMIUM -->
+    <nav class="navbar fixed top-0 left-0 w-full z-50 transition-all duration-300 px-6 lg:px-16 py-4 flex justify-between items-center bg-transparent" id="navbar">
+        <div class="logo font-playfair text-xl lg:text-2xl font-bold tracking-wide text-white drop-shadow-md">
+            Mawar Sari <span class="text-gold-400 font-light text-base lg:text-lg block lg:inline">Bakery & Cake</span>
+        </div>
+        
+        <!-- Toggle Menu HP -->
+        <div class="menu-toggle text-white text-2xl cursor-pointer lg:hidden" id="menu-toggle">
+            <i class="fas fa-bars"></i>
+        </div>
+
+        <ul class="nav-links flex flex-col lg:flex-row items-center gap-6 lg:gap-8 absolute lg:static top-full left-0 w-full lg:w-auto bg-cream-50 lg:bg-transparent shadow-xl lg:shadow-none p-6 lg:p-0 transition-all duration-300 -translate-y-full lg:translate-y-0 opacity-0 lg:opacity-100 pointer-events-none lg:pointer-events-auto" id="nav-links">
+            <li><a href="#home" class="font-medium text-gray-800 lg:text-white hover:text-gold-500 transition">Home</a></li>
+            <li><a href="#tentang" class="font-medium text-gray-800 lg:text-white hover:text-gold-500 transition">Tentang Kami</a></li>
+            <li><a href="#produk" class="font-medium text-gray-800 lg:text-white hover:text-gold-500 transition">Menu Pilihan</a></li>
+            <li><a href="#galeri" class="font-medium text-gray-800 lg:text-white hover:text-gold-500 transition">Galeri</a></li>
+            <li><a href="#testimoni" class="font-medium text-gray-800 lg:text-white hover:text-gold-500 transition">Testimoni</a></li>
+            <li><a href="#lokasi" class="font-medium text-gray-800 lg:text-white hover:text-gold-500 transition">Lokasi</a></li>
+            <li>
+                <a href="https://wa.me/6281292330422?text=Halo%20Mawar%20Sari,%20saya%20mau%20order" target="_blank" class="bg-gold-500 hover:bg-gold-600 text-white px-5 py-2.5 rounded-full font-bold text-sm shadow-md transition transform hover:-translate-y-0.5 inline-block">
+                    Pesan Sekarang
+                </a>
+            </li>
         </ul>
     </nav>
 
     <!-- HERO SECTION -->
-    <header id="home" class="hero-section">
-        <div class="hero-content">
-            <h1>Kelembutan Autentik<br> Mawar Sari Bakery & Cake</h1>
-            <p>Menghadirkan kebahagiaan roti segar dan kue ulang tahun premium pilihan keluarga yang dibuat dengan penuh cinta setiap hari.</p>
-            <a href="#produk" class="btn-primary">Lihat Menu</a>
+    <header id="home" class="relative h-screen min-h-[700px] flex items-center justify-center text-center px-4 bg-cover bg-center" style="background-image: linear-gradient(to bottom, rgba(44, 28, 28, 0.45), rgba(20, 10, 10, 0.85)), url('bg roti.jpeg');">
+        <div class="hero-content max-w-4xl mx-auto z-10 text-white" data-aos="fade-in" data-aos-duration="1200">
+            <span class="text-gold-400 font-semibold tracking-widest uppercase text-xs lg:text-sm mb-3 block drop-shadow">Artisan & Premium Bakery Shop</span>
+            <h1 class="text-4xl lg:text-6xl font-bold font-playfair mb-6 leading-tight drop-shadow-lg">
+                Cake Premium & Roti Segar Setiap Hari
+            </h1>
+            <p class="text-lg lg:text-xl text-gray-200 mb-10 max-w-2xl mx-auto font-light leading-relaxed">
+                Rayakan setiap momen spesial bersama keluarga dengan cake berkualitas premium dari Mawar Sari Bakery & Cake.
+            </p>
+            <div class="flex flex-col sm:flex-row justify-center gap-4">
+                <a href="menu.html" class="bg-gold-500 hover:bg-gold-600 text-white font-bold py-4 px-8 rounded-full shadow-lg transition transform hover:-translate-y-1">
+                    Lihat Menu
+                </a>
+                <a href="https://wa.me/6281292330422?text=Halo%20Mawar%20Sari,%20saya%20mau%20pesan%20kue" target="_blank" class="bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/30 text-white font-bold py-4 px-8 rounded-full shadow-lg transition transform hover:-translate-y-1">
+                    Pesan Sekarang
+                </a>
+            </div>
         </div>
     </header>
 
     <!-- TENTANG KAMI -->
-    <section id="tentang" class="section-container">
-        <h2>Kemurnian Rasa di Setiap Gigitan</h2>
-        <div class="grid-features">
-            <div class="feature-card">
-                <h3>Bahan Premium Pilihan</h3>
-                <p>Kami hanya menggunakan mentega murni berkualitas tinggi, cokelat pilihan, dan bahan alami tanpa kompromi untuk menciptakan kelezatan yang autentik.</p>
+    <section id="tentang" class="py-24 px-6 lg:px-16 bg-cream-50">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div data-aos="fade-right">
+                <div class="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-white">
+                    <img src="toko.jpeg" alt="Toko Mawar Sari Bakery" class="w-full h-[400px] lg:h-[480px] object-cover">
+                    <div class="absolute inset-0 bg-gradient-to-t from-maroon-800/60 to-transparent"></div>
+                    <div class="absolute bottom-6 left-6 text-white">
+                        <span class="bg-gold-500 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Sejak Lama Melayani</span>
+                        <h3 class="text-2xl font-playfair font-bold mt-2">Kelezatan Autentik Pilihan Keluarga</h3>
+                    </div>
+                </div>
             </div>
-            <div class="feature-card">
-                <h3>Dipanggang Segar Setiap Hari</h3>
-                <p>Menjamin kelembutan maksimal dan aroma panggangan yang menggugah selera langsung dari oven kami menuju ke meja hidangan Anda.</p>
-            </div>
-            <div class="feature-card">
-                <h3>Kualitas Cita Rasa Bintang Lima</h3>
-                <p>Menghadirkan harmoni rasa kue kelas dunia dengan sentuhan penuh kasih, menciptakan kemewahan kuliner yang dapat dinikmati semua kalangan.</p>
+            <div data-aos="fade-left" class="space-y-6">
+                <span class="text-gold-600 font-bold tracking-widest uppercase text-xs">Tentang Kami</span>
+                <h2 class="text-3xl lg:text-4xl font-playfair font-bold text-gray-900 leading-tight">
+                    Kemurnian Rasa di Setiap Gigitan Berkualitas Tinggi
+                </h2>
+                <p class="text-gray-600 leading-relaxed font-light">
+                    Mawar Sari Bakery & Cake hadir dengan dedikasi penuh untuk menyajikan aneka roti segar, kue kering, dan cake ulang tahun eksklusif. Kami hanya menggunakan bahan-bahan pilihan tanpa kompromi untuk memastikan kualitas rasa bintang lima.
+                </p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                    <div class="flex items-start gap-3 bg-white p-4 rounded-2xl shadow-sm border border-cream-200">
+                        <div class="w-10 h-10 rounded-xl bg-gold-500/10 text-gold-600 flex items-center justify-center font-bold text-lg flex-shrink-0">✓</div>
+                        <div>
+                            <h4 class="font-bold text-gray-900 text-sm">Bahan Premium</h4>
+                            <p class="text-xs text-gray-500">Mentega murni & cokelat pilihan.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-3 bg-white p-4 rounded-2xl shadow-sm border border-cream-200">
+                        <div class="w-10 h-10 rounded-xl bg-gold-500/10 text-gold-600 flex items-center justify-center font-bold text-lg flex-shrink-0">✓</div>
+                        <div>
+                            <h4 class="font-bold text-gray-900 text-sm">Dipanggang Segar</h4>
+                            <p class="text-xs text-gray-500">Fresh from the oven setiap hari.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="pt-4">
+                    <a href="https://wa.me/6281292330422?text=Halo%20Mawar%20Sari,%20saya%20ingin%20berkenalan%20lebih%20lanjut" target="_blank" class="inline-flex items-center gap-2 bg-maroon-700 hover:bg-maroon-800 text-white font-bold px-6 py-3 rounded-full shadow transition">
+                        <i class="fab fa-whatsapp"></i> Hubungi Kami
+                    </a>
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- SECTION PRODUK BEST SELLER -->
-    <section id="produk" class="product-section">
-        <h2 class="section-title">Produk Best Seller</h2>
-        <p class="section-subtitle">Varian paling favorit yang paling sering diburu pelanggan setia kami.</p>
-        
-        <div id="sliderCardContainer">
-            <p style="text-align:center; color:#888; grid-column: 1/-1;">Menghubungkan ke database kue...</p>
-        </div>
-
-        <div class="see-all-container">
-            <p style="color: #4b5563;">Mau lihat varian roti dan kue lezat lainnya?</p>
-            <a href="menu.html" class="btn-secondary">Lihat Semua List Kue ➡️</a>
+    <!-- STATISTIK SECTION -->
+    <section class="py-16 bg-maroon-800 text-white">
+        <div class="max-w-7xl mx-auto px-6 grid grid-cols-2 lg:grid-cols-4 gap-8 text-center">
+            <div data-aos="zoom-in">
+                <span class="block text-3xl lg:text-5xl font-playfair font-bold text-gold-400 mb-2">10+</span>
+                <span class="text-sm uppercase tracking-wider text-gray-300">Tahun Berdiri</span>
+            </div>
+            <div data-aos="zoom-in" data-aos-delay="100">
+                <span class="block text-3xl lg:text-5xl font-playfair font-bold text-gold-400 mb-2">15.000+</span>
+                <span class="text-sm uppercase tracking-wider text-gray-300">Pelanggan Puas</span>
+            </div>
+            <div data-aos="zoom-in" data-aos-delay="200">
+                <span class="block text-3xl lg:text-5xl font-playfair font-bold text-gold-400 mb-2">100+</span>
+                <span class="text-sm uppercase tracking-wider text-gray-300">Varian Produk</span>
+            </div>
+            <div data-aos="zoom-in" data-aos-delay="300">
+                <span class="block text-3xl lg:text-5xl font-playfair font-bold text-gold-400 mb-2">★★★★★</span>
+                <span class="text-sm uppercase tracking-wider text-gray-300">Rating Pelanggan</span>
+            </div>
         </div>
     </section>
 
-    <!-- KONTAK & FOOTER -->
-    <footer id="kontak" class="footer-section">
-        <h2>Tertarik Mencoba?</h2>
-        <p>Pesan sekarang juga melalui WhatsApp untuk mendapatkan promo menarik minggu ini!</p>
-        <a href="https://wa.me/6281292330422?text=Halo%20Mawar%20Sari,%20saya%20mau%20order" target="_blank" class="btn-whatsapp">
-            💬 Order Lewat WhatsApp
-        </a>
+    <!-- SECTION PRODUK BEST SELLER (TERHUBUNG KE FIREBASE ASLI) -->
+    <section id="produk" class="py-24 px-6 lg:px-16 bg-white">
+        <div class="max-w-7xl mx-auto text-center">
+            <span class="text-gold-600 font-bold tracking-widest uppercase text-xs">Pilihan Terfavorit</span>
+            <h2 class="text-3xl lg:text-4xl font-playfair font-bold text-gray-900 mt-2 mb-3">Produk Best Seller</h2>
+            <p class="text-gray-500 max-w-xl mx-auto font-light mb-12">Varian paling favorit yang selalu menjadi buruan utama pelanggan setia kami.</p>
+            
+            <!-- Container Dinamis Firebase Best Seller -->
+            <div id="sliderCardContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                <p class="text-gray-400 italic col-span-full py-8">Menghubungkan ke database kue...</p>
+            </div>
 
-        <!-- TOMBOL LOGIN ADMIN -->
-        <div style="margin-top: 35px; text-align: center;">
-            <a href="login.html" style="display: inline-block; background-color: rgba(255, 255, 255, 0.08); color: #9ca3af; border: 1px solid rgba(255, 255, 255, 0.15); padding: 8px 18px; border-radius: 20px; font-size: 12px; text-decoration: none; transition: all 0.3s ease;">
-                🔓 Log In Panel Admin
-            </a>
+            <div class="see-all-container mt-16 pt-8 border-t border-cream-200">
+                <p class="text-gray-600 mb-4 font-medium">Mau lihat varian roti dan kue lezat lainnya?</p>
+                <a href="menu.html" class="inline-block bg-transparent border-2 border-maroon-700 text-maroon-700 hover:bg-maroon-700 hover:text-white font-bold py-3.5 px-8 rounded-full transition shadow-sm">
+                    Lihat Semua List Kue ➡️
+                </a>
+            </div>
         </div>
+    </section>
 
-        <p class="copyright">© 2026 Mawar Sari Bakery & Cake. All Rights Reserved.</p>
+    <!-- GALERI SECTION -->
+    <section id="galeri" class="py-24 px-6 lg:px-16 bg-cream-50">
+        <div class="max-w-7xl mx-auto text-center">
+            <span class="text-gold-600 font-bold tracking-widest uppercase text-xs">Dokumentasi Toko</span>
+            <h2 class="text-3xl lg:text-4xl font-playfair font-bold text-gray-900 mt-2 mb-3">Galeri Kelezatan Mawar Sari</h2>
+            <p class="text-gray-500 max-w-xl mx-auto font-light mb-12">Intip suasana toko serta koleksi kreasi cake dan roti segar buatan chef profesional kami.</p>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="overflow-hidden rounded-3xl shadow-md group relative h-72">
+                    <img src="bg roti.jpeg" alt="Galeri 1" class="w-full h-full object-cover transition duration-500 group-hover:scale-110">
+                    <div class="absolute inset-0 bg-maroon-900/40 opacity-0 group-hover:opacity-100 transition duration-300 flex items-center justify-center">
+                        <span class="text-white font-bold text-sm tracking-wider uppercase border border-white/50 px-4 py-2 rounded-full backdrop-blur-sm">Cake Premium</span>
+                    </div>
+                </div>
+                <div class="overflow-hidden rounded-3xl shadow-md group relative h-72">
+                    <img src="toko.jpeg" alt="Galeri 2" class="w-full h-full object-cover transition duration-500 group-hover:scale-110">
+                    <div class="absolute inset-0 bg-maroon-900/40 opacity-0 group-hover:opacity-100 transition duration-300 flex items-center justify-center">
+                        <span class="text-white font-bold text-sm tracking-wider uppercase border border-white/50 px-4 py-2 rounded-full backdrop-blur-sm">Suasana Toko</span>
+                    </div>
+                </div>
+                <div class="overflow-hidden rounded-3xl shadow-md group relative h-72">
+                    <img src="bg roti.jpeg" alt="Galeri 3" class="w-full h-full object-cover transition duration-500 group-hover:scale-110">
+                    <div class="absolute inset-0 bg-maroon-900/40 opacity-0 group-hover:opacity-100 transition duration-300 flex items-center justify-center">
+                        <span class="text-white font-bold text-sm tracking-wider uppercase border border-white/50 px-4 py-2 rounded-full backdrop-blur-sm">Roti Segar</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- TESTIMONI SECTION -->
+    <section id="testimoni" class="py-24 px-6 lg:px-16 bg-white">
+        <div class="max-w-7xl mx-auto text-center">
+            <span class="text-gold-600 font-bold tracking-widest uppercase text-xs">Ulasan Pelanggan</span>
+            <h2 class="text-3xl lg:text-4xl font-playfair font-bold text-gray-900 mt-2 mb-3">Apa Kata Mereka?</h2>
+            <p class="text-gray-500 max-w-xl mx-auto font-light mb-12">Kepuasan pelanggan adalah prioritas utama dan semangat berkarya kami.</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
+                <div class="bg-cream-50 p-8 rounded-3xl border border-cream-200 shadow-sm relative">
+                    <div class="text-gold-500 mb-4 text-sm">★★★★★</div>
+                    <p class="text-gray-600 font-light italic mb-6 text-sm">"Kue ulang tahunnya sangat lembut dan manisnya pas! Anak-anak dan keluarga besar sangat suka. Pelayanan juga cepat lewat WhatsApp."</p>
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-maroon-700 text-white font-bold flex items-center justify-center">S</div>
+                        <div>
+                            <h4 class="font-bold text-gray-900 text-sm">Siti Rahma</h4>
+                            <span class="text-xs text-gray-400">Ibu Rumah Tangga</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-cream-50 p-8 rounded-3xl border border-cream-200 shadow-sm relative">
+                    <div class="text-gold-500 mb-4 text-sm">★★★★★</div>
+                    <p class="text-gray-600 font-light italic mb-6 text-sm">"Roti sobek dan browniesnya juara! Fresh banget karena dipanggang tiap hari. Recommended banget buat acara kantor maupun keluarga."</p>
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-gold-600 text-white font-bold flex items-center justify-center">B</div>
+                        <div>
+                            <h4 class="font-bold text-gray-900 text-sm">Budi Santoso</h4>
+                            <span class="text-xs text-gray-400">Karyawan Swasta</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-cream-50 p-8 rounded-3xl border border-cream-200 shadow-sm relative">
+                    <div class="text-gold-500 mb-4 text-sm">★★★★★</div>
+                    <p class="text-gray-600 font-light italic mb-6 text-sm">"Tempatnya bersih, mewah, dan kuenya enak-enak banget. Standar bakery bintang lima dengan harga yang tetap ramah di kantong."</p>
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-maroon-800 text-white font-bold flex items-center justify-center">D</div>
+                        <div>
+                            <h4 class="font-bold text-gray-900 text-sm">Dewi Lestari</h4>
+                            <span class="text-xs text-gray-400">Pengusaha Kuliner</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ SECTION -->
+    <section class="py-24 px-6 lg:px-16 bg-cream-50">
+        <div class="max-w-4xl mx-auto">
+            <div class="text-center mb-16">
+                <span class="text-gold-600 font-bold tracking-widest uppercase text-xs">Pertanyaan Umum</span>
+                    <h2 class="text-3xl lg:text-4xl font-playfair font-bold text-gray-900 mt-2">FAQ Mawar Sari Bakery</h2>
+            </div>
+            
+            <div class="space-y-4">
+                <details class="bg-white p-6 rounded-2xl shadow-sm border border-cream-200 group cursor-pointer">
+                    <summary class="font-bold text-gray-900 flex justify-between items-center">
+                        Bagaimana cara pemesanan kue di Mawar Sari Bakery?
+                        <span class="text-gold-600 transition group-open:rotate-180">▼</span>
+                    </summary>
+                    <p class="text-gray-600 text-sm mt-3 font-light leading-relaxed">
+                        Anda dapat langsung memilih produk di menu, klik Beli Sekarang, isi formulir checkout singkat, dan pesanan akan otomatis terhubung ke WhatsApp admin kami.
+                    </p>
+                </details>
+                <details class="bg-white p-6 rounded-2xl shadow-sm border border-cream-200 group cursor-pointer">
+                    <summary class="font-bold text-gray-900 flex justify-between items-center">
+                        Apakah melayani pengiriman kurir ke rumah?
+                        <span class="text-gold-600 transition group-open:rotate-180">▼</span>
+                    </summary>
+                    <p class="text-gray-600 text-sm mt-3 font-light leading-relaxed">
+                        Ya, kami melayani pengiriman via kurir toko/online dengan menyertakan share lokasi Google Maps pada saat checkout, atau Anda juga bisa mengambil langsung di toko fisik kami.
+                    </p>
+                </details>
+                <details class="bg-white p-6 rounded-2xl shadow-sm border border-cream-200 group cursor-pointer">
+                    <summary class="font-bold text-gray-900 flex justify-between items-center">
+                        Metode pembayaran apa saja yang tersedia?
+                        <span class="text-gold-600 transition group-open:rotate-180">▼</span>
+                    </summary>
+                    <p class="text-gray-600 text-sm mt-3 font-light leading-relaxed">
+                        Pembayaran dapat dikoordinasikan secara langsung melalui chat WhatsApp setelah pesanan Anda terkonfirmasi oleh admin kami.
+                    </p>
+                </details>
+            </div>
+        </div>
+    </section>
+
+    <!-- LOKASI SECTION -->
+    <section id="lokasi" class="py-24 px-6 lg:px-16 bg-white">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div>
+                <span class="text-gold-600 font-bold tracking-widest uppercase text-xs">Kunjungi Kami</span>
+                <h2 class="text-3xl lg:text-4xl font-playfair font-bold text-gray-900 mt-2 mb-4">Lokasi & Jam Operasional</h2>
+                <p class="text-gray-600 mb-6 font-light leading-relaxed">
+                    Nikmati aroma roti segar langsung dari oven di outlet utama kami. Kami siap melayani Anda setiap hari dengan penuh keramahan.
+                </p>
+                <div class="space-y-4 text-sm text-gray-700">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-gold-500/10 text-gold-600 flex items-center justify-center font-bold">📍</div>
+                        <span>Jl. Utama Mawar Sari Bakery & Cake, Banten</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-gold-500/10 text-gold-600 flex items-center justify-center font-bold">⏰</div>
+                        <span>Buka Setiap Hari: 07.00 - 21.00 WIB</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-gold-500/10 text-gold-600 flex items-center justify-center font-bold">💬</div>
+                        <span>WhatsApp: +62 812-9233-0422</span>
+                    </div>
+                </div>
+            </div>
+            <div class="rounded-3xl overflow-hidden shadow-xl border-4 border-cream-100 h-[350px]">
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3966.666!2d106.15!3d-6.11!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNsKwMDInMzYuMCJTIDEwNsKwMDknMDAuMCJF!5e0!3m2!1sid!2sid!4v1600000000000!5m2!1sid!2sid" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER PREMIUM -->
+    <footer class="bg-gray-900 text-white pt-20 pb-12 px-6 lg:px-16 border-t border-gray-800">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12 mb-16">
+            <div>
+                <h3 class="font-playfair text-xl font-bold text-gold-400 mb-4">Mawar Sari Bakery & Cake</h3>
+                <p class="text-gray-400 text-sm font-light leading-relaxed">
+                    Menghadirkan kebahagiaan di setiap momen spesial keluarga Anda melalui kelezatan roti segar dan kue berkualitas premium.
+                </p>
+            </div>
+            <div>
+                <h4 class="font-bold text-sm tracking-wider uppercase text-gold-400 mb-4">Jam Operasional</h4>
+                <p class="text-gray-400 text-sm font-light">Setiap Hari: 07.00 - 21.00 WIB</p>
+                <p class="text-gray-400 text-sm font-light mt-2">WhatsApp: +62 812-9233-0422</p>
+                <p class="text-gray-400 text-sm font-light mt-2">Email: info@mawarsaribakery.com</p>
+            </div>
+            <div>
+                <h4 class="font-bold text-sm tracking-wider uppercase text-gold-400 mb-4">Ikuti Kami</h4>
+                <div class="flex gap-4 mb-6">
+                    <a href="#" class="w-10 h-10 rounded-full bg-white/10 hover:bg-gold-500 flex items-center justify-center transition"><i class="fab fa-instagram"></i></a>
+                    <a href="https://wa.me/6281292330422" target="_blank" class="w-10 h-10 rounded-full bg-white/10 hover:bg-gold-500 flex items-center justify-center transition"><i class="fab fa-whatsapp"></i></a>
+                    <a href="#" class="w-10 h-10 rounded-full bg-white/10 hover:bg-gold-500 flex items-center justify-center transition"><i class="far fa-envelope"></i></a>
+                </div>
+                <!-- Tombol Admin Terintegrasi -->
+                <a href="login.html" class="inline-block bg-white/5 hover:bg-white/10 border border-white/20 text-gray-300 text-xs px-4 py-2 rounded-xl transition">
+                    🔓 Log In Panel Admin
+                </a>
+            </div>
+        </div>
+        <div class="max-w-7xl mx-auto text-center border-t border-gray-800 pt-8 text-xs text-gray-500">
+            © 2026 Mawar Sari Bakery & Cake. All Rights Reserved.
+        </div>
     </footer>
 
-    <!-- SCRIPTS -->
+    <!-- TOMBOL FLOATING WHATSAPP & SCROLL TOP -->
+    <a href="https://wa.me/6281292330422?text=Halo%20Mawar%20Sari,%20saya%20mau%20tanya%20seputar%20kue" class="fixed bottom-6 right-6 bg-[#25D366] text-white w-14 h-14 rounded-full flex items-center justify-center text-2xl shadow-2xl hover:scale-110 transition z-40" target="_blank" title="Chat WhatsApp">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+    
+    <button id="scrollTopBtn" class="fixed bottom-24 right-6 bg-gold-600 text-white w-12 h-12 rounded-full hidden items-center justify-center shadow-lg hover:bg-gold-700 transition z-40 title='Kembali ke atas'">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <!-- SCRIPTS (Sistem Asli Dipertahankan Sepenuhnya) -->
     <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
     <script>
-        // ======= 1. KONFIGURASI FIREBASE RESMI =======
+        // Inisialisasi AOS Animasi
+        if (typeof AOS !== 'undefined') {
+            AOS.init({ once: true, duration: 800 });
+        }
+
+        // Loader Handler
+        window.addEventListener('load', function() {
+            const loader = document.getElementById('loader');
+            if (loader) {
+                loader.style.opacity = '0';
+                setTimeout(() => { loader.style.display = 'none'; }, 500);
+            }
+        });
+
+        // Navbar Scroll Effect
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('navbar');
+            const scrollTopBtn = document.getElementById('scrollTopBtn');
+            
+            if (window.scrollY > 50) {
+                navbar.classList.add('glass-nav', 'shadow-md', 'py-3');
+                navbar.classList.remove('bg-transparent', 'py-4');
+                // Ubah warna teks logo & menu saat scrolled jika perlu
+            } else {
+                navbar.classList.remove('glass-nav', 'shadow-md', 'py-3');
+                navbar.classList.add('bg-transparent', 'py-4');
+            }
+
+            if (window.scrollY > 300) {
+                scrollTopBtn.style.display = 'flex';
+            } else {
+                scrollTopBtn.style.display = 'none';
+            }
+        });
+
+        document.getElementById('scrollTopBtn').addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // Mobile Menu Toggle
+        const menuToggle = document.getElementById("menu-toggle");
+        const navLinks = document.getElementById("nav-links");
+        if (menuToggle && navLinks) {
+            menuToggle.addEventListener("click", function() { 
+                navLinks.classList.toggle("-translate-y-full");
+                navLinks.classList.toggle("opacity-0");
+                navLinks.classList.toggle("pointer-events-none");
+            });
+        }
+
+        // ======= 1. KONFIGURASI FIREBASE RESMI (TIDAK DIUBAH) =======
         const firebaseConfig = {
             apiKey: "AIzaSyBV6z7KT4OM8QiopYoFbRUGI6248HEkE8w",
             authDomain: "mawar-sari-bakery.firebaseapp.com",
@@ -407,26 +444,7 @@
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
-        // ======= 2. TOGGLE MENU HP =======
-        const menuToggle = document.getElementById("menu-toggle");
-        const navLinks = document.getElementById("nav-links");
-        if (menuToggle && navLinks) {
-            menuToggle.addEventListener("click", function() { 
-                navLinks.classList.toggle("active"); 
-            });
-        }
-
-        // ======= 3. EFEK NAVBAR BERUBAH SAAT SCROLL =======
-        window.addEventListener('scroll', function() {
-            const navbar = document.getElementById('navbar');
-            if (window.scrollY > 40) {
-                navbar.classList.add('scrolled');
-            } else {
-                navbar.classList.remove('scrolled');
-            }
-        });
-
-        // ======= 4. KONEKSI KE FIREBASE UNTUK PRODUK BEST SELLER =======
+        // ======= 2. KONEKSI KE FIREBASE UNTUK PRODUK BEST SELLER (LOGIKA ASLI) =======
         const bSellerContainer = document.getElementById('sliderCardContainer');
         let bestSellerProducts = [];
 
@@ -445,7 +463,7 @@
             bestSellerProducts = [];
             
             if (!data) {
-                bSellerContainer.innerHTML = `<p style="text-align:center; color:#888; font-style:italic; grid-column: 1/-1;">Belum ada menu Best Seller yang dipasang.</p>`;
+                bSellerContainer.innerHTML = `<p class="text-gray-400 italic col-span-full py-8">Belum ada menu Best Seller yang dipasang.</p>`;
                 return;
             }
 
@@ -464,38 +482,18 @@
                     });
 
                     const card = document.createElement('div');
-                    card.style.backgroundColor = "#ffffff";
-                    card.style.borderRadius = "16px";
-                    card.style.border = "1px solid #f3f4f6";
-                    card.style.boxShadow = "0 4px 15px rgba(0,0,0,0.04)";
-                    card.style.padding = "16px";
-                    card.style.display = "flex";
-                    card.style.flexDirection = "column";
-                    card.style.gap = "12px";
-                    card.style.textAlign = "left";
-                    card.style.width = "100%";
-                    card.style.maxWidth = "280px";
-                    card.style.margin = "0 auto";
-                    card.style.transition = "transform 0.2s ease, box-shadow 0.2s ease";
-
-                    card.onmouseover = function() {
-                        card.style.transform = "translateY(-4px)";
-                        card.style.boxShadow = "0 8px 25px rgba(0,0,0,0.08)";
-                    };
-                    card.onmouseout = function() {
-                        card.style.transform = "translateY(0)";
-                        card.style.boxShadow = "0 4px 15px rgba(0,0,0,0.04)";
-                    };
+                    card.className = "bg-cream-50 rounded-[24px] p-4 border border-cream-200 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between group transform hover:-translate-y-1 relative";
                     
                     card.innerHTML = `
-                        <div style="width: 100%; height: 160px; border-radius: 12px; overflow: hidden; background-color: #f3f4f6;">
-                            <img src="${gambarAman}" alt="${namaAman}" style="width: 100%; height: 100%; object-fit: cover;">
+                        <div class="relative w-full h-52 rounded-2xl overflow-hidden bg-gray-100 mb-4">
+                            <img src="${gambarAman}" alt="${namaAman}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                            <span class="absolute top-3 left-3 bg-rose-600 text-white text-[11px] font-bold px-3 py-1 rounded-full shadow">🔥 Best Seller</span>
                         </div>
-                        <div style="display: flex; flex-direction: column; gap: 4px;">
-                            <h3 style="font-size: 16px; font-weight: 700; color: #111827; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${namaAman}">${namaAman}</h3>
-                            <p style="font-size: 15px; font-weight: 800; color: #E48227; margin: 0;">Rp ${formatRupiahHP(hargaAman)}</p>
+                        <div class="text-left space-y-1 mb-4">
+                            <h3 class="font-playfair font-bold text-gray-900 text-lg line-clamp-1">${namaAman}</h3>
+                            <p class="font-bold text-gold-600 text-base">Rp ${formatRupiahHP(hargaAman)}</p>
                         </div>
-                        <button onclick="prosesBeli('${namaAman.replace(/'/g, "\\'")}')" style="width: 100%; background-color: #E48227; color: #ffffff; border: none; border-radius: 10px; padding: 10px; font-size: 13px; font-weight: 700; cursor: pointer; transition: background-color 0.2s; margin-top: auto;">
+                        <button onclick="prosesBeli('${namaAman.replace(/'/g, "\\'")}')" class="w-full bg-gold-500 hover:bg-gold-600 text-white font-bold py-3 rounded-xl transition shadow text-sm">
                             Beli Sekarang
                         </button>
                     `;
@@ -504,11 +502,11 @@
             });
 
             if (bestSellerProducts.length === 0) {
-                bSellerContainer.innerHTML = `<p style="text-align:center; color:#888; font-style:italic; grid-column: 1/-1;">Belum ada menu Best Seller saat ini.</p>`;
+                bSellerContainer.innerHTML = `<p class="text-gray-400 italic col-span-full py-8">Belum ada menu Best Seller saat ini.</p>`;
             }
         });
 
-        // ======= 5. PROSES KIRIM DATA PRODUK KE CHECKOUT =======
+        // ======= 3. PROSES KIRIM DATA PRODUK KE CHECKOUT (LOGIKA ASLI) =======
         function prosesBeli(namaKue) {
             const produkDipilih = bestSellerProducts.find(item => item.name === namaKue);
             
