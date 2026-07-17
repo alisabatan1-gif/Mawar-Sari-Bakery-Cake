@@ -20,10 +20,14 @@
     </nav>
 
     <div class="container mx-auto p-6 max-w-6xl grid grid-cols-1 md:grid-cols-3 gap-6">
-        <!-- Form Tambah Produk -->
+        <!-- Form Tambah/Edit Produk -->
         <div class="bg-white p-6 rounded-lg shadow-md h-fit">
-            <h2 class="text-xl font-semibold mb-4 text-gray-800 border-b pb-2">Tambah Menu Kue Baru</h2>
+            <h2 id="formTitle" class="text-xl font-semibold mb-4 text-gray-800 border-b pb-2">Tambah Menu Kue Baru</h2>
             <form id="productForm" class="space-y-4">
+                <!-- Hidden Input untuk menyimpan ID kue saat mode EDIT -->
+                <input type="hidden" id="editKueId">
+                <input type="hidden" id="oldFotoUrl">
+
                 <div>
                     <label class="block text-sm font-medium text-gray-700">Nama Kue</label>
                     <input type="text" id="namaKue" required class="w-full mt-1 p-2 border border-gray-300 rounded focus:ring-2 focus:ring-red-500 outline-none">
@@ -37,19 +41,35 @@
                     <textarea id="deskripsiKue" rows="3" required class="w-full mt-1 p-2 border border-gray-300 rounded focus:ring-2 focus:ring-red-500 outline-none"></textarea>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700">Foto Produk</label>
+                    <label class="block text-sm font-medium text-gray-700">Foto Produk <span id="fotoRequiredLabel" class="text-xs text-gray-500">(Wajib)</span></label>
                     <input type="file" id="fotoKue" accept="image/*" required class="w-full mt-1 text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-red-50 file:text-red-700 hover:file:bg-red-100">
+                    <p id="editFotoNote" class="text-xs text-amber-600 mt-1 hidden">💡 Kosongkan jika tidak ingin mengganti foto yang sudah ada.</p>
                 </div>
-                <button type="submit" id="btnSubmit" class="w-full bg-red-600 text-white p-3 rounded font-semibold hover:bg-red-700 transition shadow">
-                    Simpan & Upload Produk
-                </button>
+                
+                <!-- Pilihan Centang Best Seller -->
+                <div class="pt-2">
+                    <label class="inline-flex items-center gap-2 cursor-pointer bg-amber-50 border border-amber-200 p-3 rounded-lg w-full">
+                        <input type="checkbox" id="bestSellerCheck" class="w-5 h-5 rounded text-amber-500 focus:ring-amber-400 border-gray-300 cursor-pointer accent-amber-500">
+                        <span class="text-sm font-semibold text-amber-800 select-none">Tampilkan di Slider Best Seller (Depan)</span>
+                    </label>
+                </div>
+
+                <div class="flex flex-col gap-2">
+                    <button type="submit" id="btnSubmit" class="w-full bg-red-600 text-white p-3 rounded font-semibold hover:bg-red-700 transition shadow">
+                        Simpan & Upload Produk
+                    </button>
+                    <!-- Tombol Batal Edit (Hanya muncul saat mode edit aktif) -->
+                    <button type="button" id="btnBatalEdit" class="w-full bg-gray-300 text-gray-700 p-2 rounded font-semibold hover:bg-gray-400 transition hidden">
+                        Batal Edit
+                    </button>
+                </div>
             </form>
         </div>
 
         <!-- Daftar Produk Terpajang -->
         <div class="bg-white p-6 rounded-lg shadow-md md:col-span-2">
             <h2 class="text-xl font-semibold mb-4 text-gray-800 border-b pb-2">Daftar Menu Saat Ini (Live)</h2>
-            <div id="loadingStatus" class="text-amber-600 font-medium italic hidden mb-4">⌛ Sedang memproses foto ke Cloudinary... Mohon tunggu...</div>
+            <div id="loadingStatus" class="text-amber-600 font-medium italic hidden mb-4">⌛ Sedang memproses... Mohon tunggu...</div>
             <div id="daftarProduk" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
                 <!-- Data menu dari Firebase akan muncul di sini secara otomatis -->
             </div>
@@ -81,7 +101,23 @@
         const productForm = document.getElementById('productForm');
         const loadingStatus = document.getElementById('loadingStatus');
         const btnSubmit = document.getElementById('btnSubmit');
+        const btnBatalEdit = document.getElementById('btnBatalEdit');
         const daftarProduk = document.getElementById('daftarProduk');
+        const formTitle = document.getElementById('formTitle');
+        
+        // Form inputs
+        const editKueId = document.getElementById('editKueId');
+        const oldFotoUrl = document.getElementById('oldFotoUrl');
+        const namaKueInput = document.getElementById('namaKue');
+        const hargaKueInput = document.getElementById('hargaKue');
+        const deskripsiKueInput = document.getElementById('deskripsiKue');
+        const fotoKueInput = document.getElementById('fotoKue');
+        const bestSellerCheck = document.getElementById('bestSellerCheck');
+        const fotoRequiredLabel = document.getElementById('fotoRequiredLabel');
+        const editFotoNote = document.getElementById('editFotoNote');
+
+        // Global state untuk melacak daftar kue di memori lokal admin
+        let localKatalog = {};
 
         // ======= 3. FUNGSI UPLOAD DENGAN DETEKSI ERROR GAMBLANG =======
         async function uploadKeCloudinary(file) {
@@ -104,45 +140,64 @@
             return result.secure_url;
         }
 
-        // ======= 4. PROSES JALAN: UPLOAD & SIMPAN KE DATABASE =======
+        // ======= 4. PROSES SIMPAN / UPDATE DATABASE =======
         productForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            const nama = document.getElementById('namaKue').value;
-            const harga = document.getElementById('hargaKue').value;
-            const deskripsi = document.getElementById('deskripsiKue').value;
-            const fotoFile = document.getElementById('fotoKue').files[0];
+            const isEditMode = editKueId.value !== "";
+            const nama = namaKueInput.value;
+            const harga = hargaKueInput.value;
+            const deskripsi = deskripsiKueInput.value;
+            const fotoFile = fotoKueInput.files[0];
+            const isBestSeller = bestSellerCheck.checked;
 
             // Animasi loading
             btnSubmit.disabled = true;
             loadingStatus.classList.remove('hidden');
-            btnSubmit.innerText = "Sedang Mengupload Gambar...";
+            btnSubmit.innerText = isEditMode ? "Sedang Memperbarui Data..." : "Sedang Mengupload Gambar...";
 
             try {
-                // Jalankan upload gambar ke server Cloudinary
-                const urlGambarTeroptimasi = await uploadKeCloudinary(fotoFile);
+                let urlGambarFinal = oldFotoUrl.value;
 
-                // Disinkronkan masuk ke path 'katalog_menu'
-                const menuBaruRef = database.ref('katalog_menu').push();
-                await menuBaruRef.set({
-                    id: menuBaruRef.key,
-                    nama: nama,
-                    harga: parseInt(harga),
-                    deskripsi: deskripsi,
-                    image: urlGambarTeroptimasi
-                });
+                // Jika ada file foto baru yang diunggah
+                if (fotoFile) {
+                    urlGambarFinal = await uploadKeCloudinary(fotoFile);
+                }
 
-                alert('Alhamdulillah, produk kue berhasil masuk ke katalog toko!');
-                productForm.reset();
+                if (isEditMode) {
+                    // MODE EDIT: Update data di Firebase pada path ID spesifik
+                    const targetId = editKueId.value;
+                    await database.ref('katalog_menu/' + targetId).update({
+                        nama: nama,
+                        harga: parseInt(harga),
+                        deskripsi: deskripsi,
+                        image: urlGambarFinal,
+                        best_seller: isBestSeller
+                    });
+                    alert('Data kue berhasil diperbarui!');
+                } else {
+                    // MODE TAMBAH BARU: Push data baru ke Firebase
+                    const menuBaruRef = database.ref('katalog_menu').push();
+                    await menuBaruRef.set({
+                        id: menuBaruRef.key,
+                        nama: nama,
+                        harga: parseInt(harga),
+                        deskripsi: deskripsi,
+                        image: urlGambarFinal,
+                        best_seller: isBestSeller
+                    });
+                    alert('Alhamdulillah, produk kue baru berhasil ditambahkan!');
+                }
+
+                resetFormKeSemula();
 
             } catch (error) {
                 console.error("Detail Error:", error);
                 alert('Oops! Proses gagal karena: ' + error.message);
             } finally {
-                // Matikan loading
                 btnSubmit.disabled = false;
                 loadingStatus.classList.add('hidden');
-                btnSubmit.innerText = "Simpan & Upload Produk";
+                updateSubmitButtonText();
             }
         });
 
@@ -150,36 +205,109 @@
         database.ref('katalog_menu').on('value', (snapshot) => {
             daftarProduk.innerHTML = "";
             const data = snapshot.val();
+            localKatalog = data || {};
             
             if (!data) {
-                daftarProduk.innerHTML = `<p class="text-gray-500 italic">Belum ada menu kue yang terdaftar.</p>`;
+                daftarProduk.innerHTML = `<p class="text-gray-500 italic col-span-2">Belum ada menu kue yang terdaftar.</p>`;
                 return;
             }
 
             Object.keys(data).forEach((key) => {
                 const item = data[key];
+                
+                // Cek status Best Seller untuk label
+                const statusBestSeller = (item.best_seller === true || item.isBestSeller === true) 
+                    ? `<span class="absolute top-2 right-2 bg-amber-500 text-white text-[10px] font-bold px-2 py-1 rounded shadow-sm">🔥 Best Seller</span>` 
+                    : '';
+
                 const card = document.createElement('div');
-                card.className = "bg-gray-50 p-4 rounded-lg border border-gray-200 flex flex-col justify-between shadow-sm";
+                card.className = "bg-gray-50 p-4 rounded-lg border border-gray-200 flex flex-col justify-between shadow-sm relative";
                 card.innerHTML = `
                     <div>
-                        <img src="${item.image}" alt="${item.nama}" class="w-full h-32 object-cover rounded mb-2 bg-gray-200">
+                        <div class="relative">
+                            <img src="${item.image}" alt="${item.nama}" class="w-full h-32 object-cover rounded mb-2 bg-gray-200">
+                            ${statusBestSeller}
+                        </div>
                         <h3 class="font-bold text-gray-800 text-lg">${item.nama}</h3>
                         <p class="text-red-600 font-semibold text-sm">Rp ${item.harga.toLocaleString('id-ID')}</p>
                         <p class="text-gray-600 text-xs mt-1 line-clamp-2">${item.deskripsi}</p>
                     </div>
-                    <button onclick="hapusProduk('${item.id}')" class="mt-3 bg-gray-200 hover:bg-red-100 text-red-600 font-medium py-1 px-3 text-xs rounded transition text-center w-full">
-                        Hapus Kue
-                    </button>
+                    <div class="grid grid-cols-2 gap-2 mt-3">
+                        <button onclick="aktifkanModeEdit('${item.id}')" class="bg-blue-50 hover:bg-blue-100 text-blue-600 font-medium py-1.5 px-3 text-xs rounded transition text-center">
+                            ✏️ Edit Kue
+                        </button>
+                        <button onclick="hapusProduk('${item.id}')" class="bg-gray-100 hover:bg-red-50 text-red-600 font-medium py-1.5 px-3 text-xs rounded transition text-center">
+                            🗑️ Hapus
+                        </button>
+                    </div>
                 `;
                 daftarProduk.appendChild(card);
             });
         });
 
-        // ======= 6. FUNGSI HAPUS PRODUK =======
+        // ======= 6. FUNGSI AKTIFKAN MODE EDIT =======
+        window.aktifkanModeEdit = function(id) {
+            const kue = localKatalog[id];
+            if (!kue) return;
+
+            // Isi form dengan data lama
+            editKueId.value = id;
+            oldFotoUrl.value = kue.image;
+            namaKueInput.value = kue.nama;
+            hargaKueInput.value = kue.harga;
+            deskripsiKueInput.value = kue.deskripsi;
+            bestSellerCheck.checked = (kue.best_seller === true || kue.isBestSeller === true);
+
+            // Sesuaikan validasi input foto (saat edit, foto tidak wajib diisi ulang)
+            fotoKueInput.required = false;
+            fotoRequiredLabel.classList.add('hidden');
+            editFotoNote.classList.remove('hidden');
+
+            // Ubah tampilan visual Form
+            formTitle.innerText = "Edit Menu Kue";
+            formTitle.classList.add("text-blue-700");
+            btnBatalEdit.classList.remove('hidden');
+            updateSubmitButtonText();
+
+            // Scroll otomatis layar ke bagian form agar nyaman di HP/PC
+            productForm.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // ======= 7. BATAL EDIT & RESET FORM =======
+        function resetFormKeSemula() {
+            productForm.reset();
+            editKueId.value = "";
+            oldFotoUrl.value = "";
+            
+            // Kembalikan validasi foto menjadi wajib
+            fotoKueInput.required = true;
+            fotoRequiredLabel.classList.remove('hidden');
+            editFotoNote.classList.add('hidden');
+
+            // Kembalikan tampilan visual Form ke Tambah Baru
+            formTitle.innerText = "Tambah Menu Kue Baru";
+            formTitle.classList.remove("text-blue-700");
+            btnBatalEdit.classList.add('hidden');
+            updateSubmitButtonText();
+        }
+
+        btnBatalEdit.addEventListener('click', resetFormKeSemula);
+
+        function updateSubmitButtonText() {
+            const isEditMode = editKueId.value !== "";
+            btnSubmit.innerText = isEditMode ? "Perbarui & Update Produk" : "Simpan & Upload Produk";
+        }
+
+        // ======= 8. FUNGSI HAPUS PRODUK =======
         window.hapusProduk = function(id) {
             if(confirm("Apakah Anda yakin ingin menghapus menu kue ini dari katalog toko?")) {
                 database.ref('katalog_menu/' + id).remove()
-                .then(() => alert("Menu kue berhasil dihapus."))
+                .then(() => {
+                    alert("Menu kue berhasil dihapus.");
+                    if(editKueId.value === id) {
+                        resetFormKeSemula();
+                    }
+                })
                 .catch((err) => alert("Gagal menghapus: " + err.message));
             }
         }

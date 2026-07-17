@@ -53,6 +53,25 @@
                         <option value="Kirim Kurir (Ongkir Menyesuaikan)">Kirim Kurir (Ongkir Menyesuaikan)</option>
                     </select>
                 </div>
+
+                <!-- KOLOM ALAMAT & MAPS (Dinamis: Muncul jika pilih Kirim Kurir) -->
+                <div id="kolom-alamat" class="hidden space-y-4 pt-2">
+                    <div>
+                        <label class="block text-sm font-bold text-gray-900 mb-1">Alamat Lengkap:</label>
+                        <textarea id="alamat-lengkap" rows="3" placeholder="Tuliskan alamat lengkap (Nama Jalan, No. Rumah, RT/RW, Patokan)" class="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 outline-none resize-none"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-900 mb-1">Pin Koordinat Lokasi Anda:</label>
+                        
+                        <!-- TOMBOL AKSES GOOGLE MAPS LANGSUNG -->
+                        <a href="https://www.google.com/maps" target="_blank" class="w-full mb-2 bg-[#3498db] hover:bg-[#2980b9] text-white font-bold py-2 px-4 rounded-xl text-xs flex justify-center items-center gap-2 transition shadow-sm">
+                            📍 Klik di Sini Untuk Buka Google Maps
+                        </a>
+                        
+                        <input type="text" id="link-maps" placeholder="Tempel / Paste link share lokasi Google Maps Anda di sini" class="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 outline-none">
+                        <p class="text-[11px] text-gray-500 mt-1">*Buka maps dengan tombol di atas, cari lokasi rumah Anda, lalu salin link bagikannya ke kotak ini.</p>
+                    </div>
+                </div>
             </div>
 
             <!-- Total Bayar -->
@@ -111,6 +130,11 @@
         const txtTotalBayar = document.getElementById('total-bayar');
         const selectMetode = document.getElementById('metode-kirim');
         const btnKirim = document.getElementById('btn-kirim');
+        
+        // Elemen Alamat Baru
+        const kolomAlamat = document.getElementById('kolom-alamat');
+        const inputAlamat = document.getElementById('alamat-lengkap');
+        const inputMaps = document.getElementById('link-maps');
 
         // Taruh data ke tampilan atas
         previewGambar.src = gambarKue;
@@ -138,6 +162,18 @@
         inputJumlah.addEventListener('input', hitungTotal);
         inputJumlah.addEventListener('change', hitungTotal);
 
+        // ======= TAMPIL/SEMBUNYIKAN KOLOM ALAMAT SECARA DINAMIS =======
+        selectMetode.addEventListener('change', function() {
+            if (this.value === "Kirim Kurir (Ongkir Menyesuaikan)") {
+                kolomAlamat.classList.remove('hidden');
+            } else {
+                kolomAlamat.classList.add('hidden');
+                // Kosongkan input agar tidak terbawa di pesan WA jika diganti ke Ambil Sendiri
+                inputAlamat.value = "";
+                inputMaps.value = "";
+            }
+        });
+
         // ======= 4. PROSES KIRIM DATA KE WHATSAPP TOKO =======
         btnKirim.addEventListener('click', () => {
             const penerima = document.getElementById('nama-penerima').value.trim();
@@ -145,6 +181,9 @@
             const qty = inputJumlah.value;
             const metode = selectMetode.value;
             const totalBayar = hargaKue * qty;
+            
+            const alamatText = inputAlamat.value.trim();
+            const mapsText = inputMaps.value.trim();
 
             // Validasi inputan agar wajib diisi dahulu
             if (!penerima) {
@@ -154,6 +193,25 @@
             if (!waPembeli) {
                 alert("Harap isi Nomor WhatsApp Anda!");
                 return;
+            }
+
+            // Validasi Alamat jika opsi Pengantaran Kurir dipilih
+            if (metode === "Kirim Kurir (Ongkir Menyesuaikan)" && !alamatText) {
+                alert("Harap isi Alamat Lengkap pengiriman Anda!");
+                return;
+            }
+            if (metode === "Kirim Kurir (Ongkir Menyesuaikan)" && !mapsText) {
+                alert("Harap isi atau tempel link lokasi Google Maps Anda!");
+                return;
+            }
+
+            // Konstruksi teks bagian alamat jika memilih Kurir
+            let rincianAlamat = "";
+            if (metode === "Kirim Kurir (Ongkir Menyesuaikan)") {
+                rincianAlamat = `\n* Alamat Lengkap: ${alamatText}`;
+                if (mapsText) {
+                    rincianAlamat += `\n* Google Maps: ${mapsText}`;
+                }
             }
 
             // Menyusun format pesan WhatsApp yang rapi
@@ -168,7 +226,7 @@
 *DATA PENERIMA*
 * Nama: ${penerima}
 * No. HP: ${waPembeli}
-* Metode Pengiriman: ${metode}
+* Metode Pengiriman: ${metode}${rincianAlamat}
 
 Mohon segera diproses ya, terima kasih!`;
 

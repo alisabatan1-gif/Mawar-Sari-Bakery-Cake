@@ -18,6 +18,44 @@
     <!-- LOAD SDK FIREBASE V8 -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+    <!-- STYLE TAMBAHAN UNTUK NAVBAR DINAMIS ELEGAN (TERANG & BERSIH) -->
+    <style>
+        /* Efek transisi halus pada navbar, logo, tombol menu, dan link navigasi */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            z-index: 1000;
+        }
+
+        .navbar .logo,
+        .navbar .nav-links a,
+        .navbar .menu-toggle {
+            transition: color 0.3s ease;
+        }
+
+        /* KEADAAN SAAT DIGESER (SCROLLED): Latar belakang menjadi putih bersih, tulisan menjadi gelap */
+        .navbar.scrolled {
+            background-color: #ffffff !important; /* Latar belakang putih bersih */
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); /* Bayangan super halus di bawah navbar */
+        }
+
+        /* Mengubah teks logo, menu, dan tombol ☰ menjadi hitam ketika di-scroll */
+        .navbar.scrolled .logo {
+            color: #111827 !important;
+        }
+
+        .navbar.scrolled .nav-links a {
+            color: #111827 !important;
+        }
+
+        .navbar.scrolled .menu-toggle {
+            color: #111827 !important;
+        }
+    </style>
 </head>
 <body>
 
@@ -67,8 +105,8 @@
             <h2 class="section-title">Produk Best Seller</h2>
             <p class="section-subtitle">Varian paling favorit yang paling sering diburu pelanggan setia kami.</p>
             
-            <div style="display: flex; justify-content: center; padding: 20px;">
-                <div class="product-card" id="sliderCardContainer" style="width: 350px; position: relative; transition: opacity 0.3s ease-in-out;">
+            <div style="display: flex; justify-content: center; padding: 20px; width: 100%;">
+                <div id="sliderCardContainer" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; width: 100%; max-width: 1100px;">
                     <p style="text-align:center; color:#888;">Menghubungkan ke database kue...</p>
                 </div>
             </div>
@@ -165,8 +203,18 @@
             });
         }
 
+        // SCRIPT DETEKSI SCROLL UNTUK MENGGANTI WARNA NAVBAR MENJADI TERANG (CLEAN)
+        window.addEventListener('scroll', function() {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 50) { // Jika digeser ke bawah lebih dari 50 piksel
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
         // ======= 3. KONEKSI KE FIREBASE UNTUK PRODUK BEST SELLER =======
-        const bSellerContainer = document.getElementById('best-seller-container') || document.getElementById('sliderCardContainer');
+        const bSellerContainer = document.getElementById('sliderCardContainer');
         let bestSellerProducts = [];
 
         // Format rupiah agar aman di HP
@@ -177,7 +225,7 @@
             return angka.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
         }
 
-        // Ambil data menu otomatis dari Firebase
+        // Ambil data menu otomatis dari Firebase dengan Filter Best Seller
         database.ref('katalog_menu').on('value', (snapshot) => {
             if (!bSellerContainer) return; // Mencegah error jika element container tidak ada
             
@@ -186,40 +234,73 @@
             bestSellerProducts = [];
             
             if (!data) {
-                bSellerContainer.innerHTML = `<p class="text-gray-400 italic text-sm py-4" style="text-align:center; color:#888;">Belum ada menu Best Seller yang dipasang.</p>`;
+                bSellerContainer.innerHTML = `<p style="text-align:center; color:#888; font-style:italic; width: 100%;">Belum ada menu Best Seller yang dipasang.</p>`;
                 return;
             }
 
             Object.keys(data).forEach((key) => {
                 const item = data[key];
-                const namaAman = item.nama ? item.nama : "Roti Spesial";
-                const hargaAman = item.harga ? item.harga : 0;
-                const gambarAman = item.image ? item.image : "toko.jpeg";
-
-                bestSellerProducts.push({
-                    name: namaAman,
-                    price: hargaAman,
-                    image: gambarAman
-                });
-
-                // Buat card produk yang fleksibel & estetik
-                const card = document.createElement('div');
-                card.className = "min-w-[220px] w-[220px] bg-white rounded-3xl shadow-[0_4px_15px_rgba(0,0,0,0.04)] border border-gray-100 p-4 flex flex-col gap-3 flex-shrink-0 text-left";
                 
-                card.innerHTML = `
-                    <div class="w-full h-36 rounded-2xl overflow-hidden bg-gray-100">
-                        <img src="${gambarAman}" alt="${namaAman}" class="w-full h-full object-cover">
-                    </div>
-                    <div class="space-y-1">
-                        <h3 class="font-bold text-gray-900 text-base truncate">${namaAman}</h3>
-                        <p class="text-[#E48227] font-extrabold text-base">Rp ${formatRupiahHP(hargaAman)}</p>
-                    </div>
-                    <button onclick="prosesBeli('${namaAman.replace(/'/g, "\\'")}')" class="w-full bg-[#E48227] hover:bg-[#d2731e] text-white text-xs font-bold py-3 rounded-xl transition mt-1">
-                        Beli Sekarang
-                    </button>
-                `;
-                bSellerContainer.appendChild(card);
+                // PERINTAH FILTER: Hanya menampilkan kue jika ditandai Best Seller di Database (best_seller: true ATAU isBestSeller: true)
+                if (item.best_seller === true || item.isBestSeller === true || item.status === "Best Seller") {
+                    
+                    const namaAman = item.nama ? item.nama : "Roti Spesial";
+                    const hargaAman = item.harga ? item.harga : 0;
+                    const gambarAman = item.image ? item.image : "toko.jpeg";
+
+                    bestSellerProducts.push({
+                        name: namaAman,
+                        price: hargaAman,
+                        image: gambarAman
+                    });
+
+                    // Buat card produk yang fleksibel, rapi, & tidak kebesaran (Lebar dipatok 250px)
+                    const card = document.createElement('div');
+                    
+                    // Gunakan inline styling penuh untuk mengamankan dimensi ukuran agar presisi & estetik
+                    card.style.width = "250px";
+                    card.style.backgroundColor = "#ffffff";
+                    card.style.borderRadius = "20px";
+                    card.style.border = "1px solid #f3f4f6";
+                    card.style.boxShadow = "0 4px 15px rgba(0,0,0,0.04)";
+                    card.style.padding = "16px";
+                    card.style.display = "flex";
+                    card.style.flexDirection = "column";
+                    card.style.gap = "12px";
+                    card.style.textAlign = "left";
+                    card.style.boxSizing = "border-box";
+                    card.style.transition = "transform 0.2s ease, box-shadow 0.2s ease";
+
+                    // Efek hover agar interaktif
+                    card.onmouseover = function() {
+                        card.style.transform = "translateY(-4px)";
+                        card.style.boxShadow = "0 6px 20px rgba(0,0,0,0.08)";
+                    };
+                    card.onmouseout = function() {
+                        card.style.transform = "translateY(0)";
+                        card.style.boxShadow = "0 4px 15px rgba(0,0,0,0.04)";
+                    };
+                    
+                    card.innerHTML = `
+                        <div style="width: 100%; height: 150px; border-radius: 16px; overflow: hidden; background-color: #f3f4f6;">
+                            <img src="${gambarAman}" alt="${namaAman}" style="width: 100%; height: 100%; object-fit: cover;">
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 4px;">
+                            <h3 style="font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 700; color: #111827; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${namaAman}">${namaAman}</h3>
+                            <p style="font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 800; color: #E48227; margin: 0;">Rp ${formatRupiahHP(hargaAman)}</p>
+                        </div>
+                        <button onclick="prosesBeli('${namaAman.replace(/'/g, "\\'")}')" style="width: 100%; background-color: #E48227; color: #ffffff; border: none; border-radius: 12px; padding: 10px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif; transition: background-color 0.2s; margin-top: auto;">
+                            Beli Sekarang
+                        </button>
+                    `;
+                    bSellerContainer.appendChild(card);
+                }
             });
+
+            // Jika setelah difilter tidak ada satupun kue berstatus Best Seller
+            if (bestSellerProducts.length === 0) {
+                bSellerContainer.innerHTML = `<p style="text-align:center; color:#888; font-style:italic; width: 100%;">Belum ada menu Best Seller saat ini.</p>`;
+            }
         });
 
         // ======= 4. PROSES KIRIM DATA PRODUK KE CHECKOUT =======
