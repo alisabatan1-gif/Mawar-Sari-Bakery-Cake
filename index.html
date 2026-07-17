@@ -19,9 +19,8 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
-    <!-- STYLE TAMBAHAN UNTUK NAVBAR DINAMIS ELEGAN (TERANG & BERSIH) -->
+    <!-- STYLE TAMBAHAN NAVBAR & PAKSAAN UKURAN LAPTOP -->
     <style>
-        /* Efek transisi halus pada navbar, logo, tombol menu, dan link navigasi */
         .navbar {
             position: fixed;
             top: 0;
@@ -37,56 +36,49 @@
             transition: color 0.3s ease;
         }
 
-        /* KEADAAN SAAT DIGESER (SCROLLED): Latar belakang menjadi putih bersih, tulisan menjadi gelap */
         .navbar.scrolled {
-            background-color: #ffffff !important; /* Latar belakang putih bersih */
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); /* Bayangan super halus di bawah navbar */
+            background-color: #ffffff !important;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
         }
 
-        /* Mengubah teks logo, menu, dan tombol ☰ menjadi hitam ketika di-scroll */
-        .navbar.scrolled .logo {
-            color: #111827 !important;
-        }
-
-        .navbar.scrolled .nav-links a {
-            color: #111827 !important;
-        }
-
+        .navbar.scrolled .logo,
+        .navbar.scrolled .nav-links a,
         .navbar.scrolled .menu-toggle {
             color: #111827 !important;
         }
 
-        /* TAMBAHAN KODE: Memperbesar Hero Section khusus untuk layar Laptop / Desktop */
         @media screen and (min-width: 1024px) {
             .hero-section {
                 height: 100vh !important;
+                min-height: 700px !important;
                 display: flex !important;
+                flex-direction: column !important;
                 align-items: center !important;
                 justify-content: center !important;
-                padding: 0 10% !important;
+                padding: 0 5% !important;
             }
             .hero-content {
-                max-width: 900px !important;
+                max-width: 950px !important;
                 text-align: center !important;
                 margin: 0 auto !important;
             }
             .hero-content h1 {
-                font-size: 3.5rem !important;
-                line-height: 1.3 !important;
-                margin-bottom: 20px !important;
+                font-size: 4rem !important;
+                line-height: 1.25 !important;
+                margin-bottom: 25px !important;
             }
             .hero-content p {
-                font-size: 1.35rem !important;
+                font-size: 1.4rem !important;
                 line-height: 1.6 !important;
                 margin-bottom: 40px !important;
-                max-width: 800px !important;
+                max-width: 850px !important;
                 margin-left: auto !important;
                 margin-right: auto !important;
             }
             .hero-content .btn-primary {
                 font-size: 1.2rem !important;
-                padding: 15px 45px !important;
-                border-radius: 30px !important;
+                padding: 16px 50px !important;
+                border-radius: 35px !important;
                 display: inline-block !important;
             }
         }
@@ -161,7 +153,7 @@
             💬 Order Lewat WhatsApp
         </a>
 
-        <!-- TOMBOL LOGIN ADMIN (Disisipkan Rapi Sesuai Tema Gelap Footer) -->
+        <!-- TOMBOL LOGIN ADMIN -->
         <div style="margin-top: 40px; margin-bottom: 10px; text-align: center;">
             <a href="login.html" style="display: inline-block; background-color: rgba(255, 255, 255, 0.07); color: #bbb; border: 1px solid rgba(255, 255, 255, 0.15); padding: 8px 18px; border-radius: 20px; font-size: 12px; text-decoration: none; transition: all 0.3s ease; font-family: 'Inter', sans-serif;" onmouseover="this.style.backgroundColor='rgba(255, 255, 255, 0.15)'; this.style.color='#fff';" onmouseout="this.style.backgroundColor='rgba(255, 255, 255, 0.07)'; this.style.color='#bbb';">
                 🔓 Log In Panel Admin
@@ -184,6 +176,20 @@
     <!-- SCRIPTS -->
     <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
     <script>
+        // ======= PENGAMAN TAMBAHAN: PAKSA UKURAN VIA JS JIKA DI LAPTOP =======
+        window.addEventListener('DOMContentLoaded', () => {
+            if (window.innerWidth >= 1024) {
+                const hero = document.getElementById('home');
+                if (hero) {
+                    hero.style.height = '100vh';
+                    hero.style.minHeight = '700px';
+                    hero.style.display = 'flex';
+                    hero.style.alignItems = 'center';
+                    hero.style.justifyContent = 'center';
+                }
+            }
+        });
+
         // ======= 1. KONFIGURASI FIREBASE RESMI =======
         const firebaseConfig = {
             apiKey: "AIzaSyBV6z7KT4OM8QiopYoFbRUGI6248HEkE8w",
@@ -195,11 +201,10 @@
             appId: "1:100804150468:web:fdb97e55881183f69d7591"
         };
         
-        // Inisialisasi Firebase
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
-        // ======= 2. SCRIPT ASLI BAWAAN TEMPLATE ANDA (JANGAN DIUBAH) =======
+        // ======= 2. SCRIPT BAWAAN TEMPLATE =======
         const menuToggle = document.getElementById("menu-toggle");
         const navLinks = document.getElementById("nav-links");
         if (menuToggle && navLinks) {
@@ -208,12 +213,10 @@
             });
         }
 
-        // Animasi AOS
         if (typeof AOS !== 'undefined') {
             AOS.init({ once: true });
         }
 
-        // Loader Screen
         window.addEventListener('load', function() {
             const loader = document.getElementById('loader');
             if (loader) {
@@ -222,7 +225,6 @@
             }
         });
 
-        // Tombol Scroll ke Atas
         const scrollTopBtn = document.getElementById('scrollTopBtn');
         if (scrollTopBtn) {
             window.addEventListener('scroll', function() {
@@ -238,10 +240,9 @@
             });
         }
 
-        // SCRIPT DETEKSI SCROLL UNTUK MENGGANTI WARNA NAVBAR MENJADI TERANG (CLEAN)
         window.addEventListener('scroll', function() {
             const navbar = document.querySelector('.navbar');
-            if (window.scrollY > 50) { // Jika digeser ke bawah lebih dari 50 piksel
+            if (window.scrollY > 50) {
                 navbar.classList.add('scrolled');
             } else {
                 navbar.classList.remove('scrolled');
@@ -252,7 +253,6 @@
         const bSellerContainer = document.getElementById('sliderCardContainer');
         let bestSellerProducts = [];
 
-        // Format rupiah agar aman di HP
         function formatRupiahHP(angka) {
             if (angka === undefined || angka === null || isNaN(angka)) {
                 return "0";
@@ -260,9 +260,8 @@
             return angka.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
         }
 
-        // Ambil data menu otomatis dari Firebase dengan Filter Best Seller
         database.ref('katalog_menu').on('value', (snapshot) => {
-            if (!bSellerContainer) return; // Mencegah error jika element container tidak ada
+            if (!bSellerContainer) return;
             
             bSellerContainer.innerHTML = "";
             const data = snapshot.val();
@@ -276,9 +275,7 @@
             Object.keys(data).forEach((key) => {
                 const item = data[key];
                 
-                // PERINTAH FILTER: Hanya menampilkan kue jika ditandai Best Seller di Database (best_seller: true ATAU isBestSeller: true)
                 if (item.best_seller === true || item.isBestSeller === true || item.status === "Best Seller") {
-                    
                     const namaAman = item.nama ? item.nama : "Roti Spesial";
                     const hargaAman = item.harga ? item.harga : 0;
                     const gambarAman = item.image ? item.image : "toko.jpeg";
@@ -289,10 +286,7 @@
                         image: gambarAman
                     });
 
-                    // Buat card produk yang fleksibel, rapi, & tidak kebesaran (Lebar dipatok 250px)
                     const card = document.createElement('div');
-                    
-                    // Gunakan inline styling penuh untuk mengamankan dimensi ukuran agar presisi & estetik
                     card.style.width = "250px";
                     card.style.backgroundColor = "#ffffff";
                     card.style.borderRadius = "20px";
@@ -306,7 +300,6 @@
                     card.style.boxSizing = "border-box";
                     card.style.transition = "transform 0.2s ease, box-shadow 0.2s ease";
 
-                    // Efek hover agar interaktif
                     card.onmouseover = function() {
                         card.style.transform = "translateY(-4px)";
                         card.style.boxShadow = "0 6px 20px rgba(0,0,0,0.08)";
@@ -332,7 +325,6 @@
                 }
             });
 
-            // Jika setelah difilter tidak ada satupun kue berstatus Best Seller
             if (bestSellerProducts.length === 0) {
                 bSellerContainer.innerHTML = `<p style="text-align:center; color:#888; font-style:italic; width: 100%;">Belum ada menu Best Seller saat ini.</p>`;
             }
@@ -349,7 +341,6 @@
                     image: produkDipilih.image
                 };
                 
-                // Simpan data ke localStorage agar otomatis terbaca di checkout.html
                 localStorage.setItem('produk_checkout', JSON.stringify(dataCheckout));
                 window.location.href = 'checkout.html';
             } else {
